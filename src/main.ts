@@ -37,7 +37,7 @@ export default class AIChatPlugin extends Plugin {
       callback: () => {
         const leaves = this.app.workspace.getLeavesOfType(VIEW_TYPE_NEBI_CHAT);
         if (leaves.length > 0 && leaves[0].view instanceof ChatView) {
-          void (leaves[0].view as ChatView).clearChat();
+          void leaves[0].view.clearChat();
         }
       },
     });
@@ -54,7 +54,7 @@ export default class AIChatPlugin extends Plugin {
     this.addSettingTab(new AIChatSettingTab(this.app, this));
   }
 
-  async onunload(): Promise<void> {
+  onunload(): void {
     // Intentionally empty — do not detach leaves
   }
 
@@ -62,7 +62,7 @@ export default class AIChatPlugin extends Plugin {
     const existing = this.app.workspace.getLeavesOfType(VIEW_TYPE_NEBI_CHAT);
 
     if (existing.length > 0) {
-      this.app.workspace.revealLeaf(existing[0]);
+      await this.app.workspace.revealLeaf(existing[0]);
       return;
     }
 
@@ -72,7 +72,7 @@ export default class AIChatPlugin extends Plugin {
         type: VIEW_TYPE_NEBI_CHAT,
         active: true,
       });
-      this.app.workspace.revealLeaf(leaf);
+      await this.app.workspace.revealLeaf(leaf);
     }
   }
 }

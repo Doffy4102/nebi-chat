@@ -15,8 +15,6 @@ export class AIChatSettingTab extends PluginSettingTab {
     const { containerEl } = this;
     containerEl.empty();
 
-    new Setting(containerEl).setName("Nebi Chat Settings").setHeading();
-
     new Setting(containerEl).setName("Providers").setHeading();
 
     const providers = [
@@ -119,7 +117,7 @@ export class AIChatSettingTab extends PluginSettingTab {
         });
     }
 
-    new Setting(containerEl).setName("General").setHeading();
+    new Setting(containerEl).setName("Chat Configuration").setHeading();
 
     new Setting(containerEl)
       .setName("Default Provider")

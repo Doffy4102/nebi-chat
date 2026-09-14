@@ -58,9 +58,14 @@ export class ChatInput {
     });
 
     this.textArea.addEventListener("input", () => {
-      this.textArea.style.height = "auto";
-      this.textArea.style.height = Math.min(this.textArea.scrollHeight, 120) + "px";
+      this.resizeTextarea();
     });
+  }
+
+  private resizeTextarea(): void {
+    this.textArea.setCssProps({ "--nebi-chat-textarea-height": "auto" });
+    const newHeight = Math.min(this.textArea.scrollHeight, 120);
+    this.textArea.setCssProps({ "--nebi-chat-textarea-height": `${newHeight}px` });
   }
 
   private handleSend(): void {
@@ -68,7 +73,7 @@ export class ChatInput {
     if (!text || this.isGenerating) return;
 
     this.textArea.value = "";
-    this.textArea.style.height = "auto";
+    this.resizeTextarea();
     this.onSubmit(text);
   }
 

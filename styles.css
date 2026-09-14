@@ -296,6 +296,7 @@
   padding: var(--size-4-2) var(--size-4-3);
   overflow-x: auto;
   margin: var(--size-4-1) 0;
+  position: relative;
 }
 
 .nebi-chat-bubble-content pre code {
@@ -550,6 +551,7 @@
   resize: none;
   min-height: 22px;
   max-height: 120px;
+  height: var(--nebi-chat-textarea-height, auto);
   outline: none;
 }
 

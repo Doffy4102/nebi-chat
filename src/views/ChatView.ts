@@ -16,9 +16,16 @@ function generateId(): string {
   return Date.now().toString(36) + Math.random().toString(36).substring(2, 8);
 }
 
+function setSvgContent(parent: HTMLElement, svgContent: string): void {
+  parent.empty();
+  const doc = new DOMParser().parseFromString(svgContent, "image/svg+xml");
+  const svg = doc.querySelector("svg");
+  if (svg) parent.appendChild(document.importNode(svg, true));
+}
+
 function createSvgIcon(parent: HTMLElement, svgContent: string): HTMLElement {
   const wrapper = parent.createDiv({ cls: "nebi-chat-icon-wrapper" });
-  wrapper.innerHTML = svgContent;
+  setSvgContent(wrapper, svgContent);
   return wrapper;
 }
 
@@ -195,7 +202,7 @@ export class ChatView extends ItemView {
     this.debouncedSave();
     this.renderMessages();
 
-    this.typingIndicator = new ChatMessage(this.chatContainerEl!);
+    this.typingIndicator = new ChatMessage(this.chatContainerEl!, this);
     this.typingIndicator.renderTypingIndicator();
     this.scrollToBottom();
 
@@ -226,7 +233,7 @@ export class ChatView extends ItemView {
         fullResponse += chunk;
 
         if (!streamingMsg) {
-          streamingMsg = new ChatMessage(this.chatContainerEl!);
+          streamingMsg = new ChatMessage(this.chatContainerEl!, this);
           streamingMsg.renderStreaming(fullResponse);
           this.scrollToBottom();
         } else {
@@ -274,7 +281,7 @@ export class ChatView extends ItemView {
           this.typingIndicator = null;
         }
 
-        const errorComp = new ChatMessage(this.chatContainerEl!);
+        const errorComp = new ChatMessage(this.chatContainerEl!, this);
         errorComp.renderError(errMsg);
         this.scrollToBottom();
       }
@@ -357,7 +364,7 @@ export class ChatView extends ItemView {
     }
 
     for (const message of this.messages) {
-      const msgComponent = new ChatMessage(this.chatContainerEl);
+      const msgComponent = new ChatMessage(this.chatContainerEl, this);
       msgComponent.render(message);
     }
 

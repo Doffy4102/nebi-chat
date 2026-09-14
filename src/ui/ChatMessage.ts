@@ -4,34 +4,38 @@ import { NEBI_ICON_SVG } from "../icon-svg";
 
 function createSvgIcon(parent: HTMLElement, svgContent: string): HTMLElement {
   const wrapper = parent.createDiv({ cls: "nebi-chat-icon-wrapper" });
-  wrapper.innerHTML = svgContent;
+  setSvgContent(wrapper, svgContent);
   return wrapper;
 }
 
-const renderComponent = new Component();
+function setSvgContent(parent: HTMLElement, svgContent: string): void {
+  parent.empty();
+  const doc = new DOMParser().parseFromString(svgContent, "image/svg+xml");
+  const svg = doc.querySelector("svg");
+  if (svg) parent.appendChild(document.importNode(svg, true));
+}
 
 function addCodeBlockCopyButtons(container: HTMLElement): void {
   const pres = container.querySelectorAll("pre");
   for (const pre of Array.from(pres)) {
     if (pre.querySelector(".nebi-chat-code-copy-btn")) continue;
-    pre.style.position = "relative";
     const btn = pre.createEl("button", {
       cls: "nebi-chat-code-copy-btn",
       attr: { "aria-label": "Copy code" },
     });
     const copyIcon = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>`;
     const checkIcon = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>`;
-    btn.innerHTML = copyIcon;
+    setSvgContent(btn, copyIcon);
     btn.addEventListener("click", async () => {
       const code = pre.querySelector("code");
       const text = code ? code.textContent || "" : pre.textContent || "";
       try {
         await navigator.clipboard.writeText(text);
         btn.addClass("nebi-chat-code-copy-btn-copied");
-        btn.innerHTML = checkIcon;
+        setSvgContent(btn, checkIcon);
         window.setTimeout(() => {
           btn.removeClass("nebi-chat-code-copy-btn-copied");
-          btn.innerHTML = copyIcon;
+          setSvgContent(btn, copyIcon);
         }, 1500);
       } catch {
         // Clipboard API may be blocked
@@ -56,9 +60,11 @@ function formatRelativeTime(timestamp: number): string {
 
 export class ChatMessage {
   private containerEl: HTMLElement;
+  private component: Component;
 
-  constructor(parentEl: HTMLElement) {
+  constructor(parentEl: HTMLElement, component: Component) {
     this.containerEl = parentEl.createDiv({ cls: "nebi-chat-msg" });
+    this.component = component;
   }
 
   render(messageOrContent: Message | string, role?: string): void {
@@ -94,15 +100,15 @@ export class ChatMessage {
     const copyBtn = headerRow.createDiv({ cls: "nebi-chat-copy-btn", attr: { "aria-label": "Copy message" } });
     const copySvg = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>`;
     const checkSvg = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>`;
-    copyBtn.innerHTML = copySvg;
+    setSvgContent(copyBtn, copySvg);
     copyBtn.addEventListener("click", async () => {
       try {
         await navigator.clipboard.writeText(message.content);
         copyBtn.addClass("nebi-chat-copy-btn-copied");
-        copyBtn.innerHTML = checkSvg;
+        setSvgContent(copyBtn, checkSvg);
         window.setTimeout(() => {
           copyBtn.removeClass("nebi-chat-copy-btn-copied");
-          copyBtn.innerHTML = copySvg;
+          setSvgContent(copyBtn, copySvg);
         }, 1500);
       } catch {
         // Clipboard API may be blocked
@@ -112,7 +118,7 @@ export class ChatMessage {
     const contentEl = wrapper.createDiv({ cls: "nebi-chat-bubble-content" });
 
     if (message.role === "assistant") {
-      void MarkdownRenderer.render(renderComponent, message.content, contentEl, "");
+      void MarkdownRenderer.render(this.component, message.content, contentEl, "");
       addCodeBlockCopyButtons(contentEl);
     } else {
       contentEl.setText(message.content);
@@ -135,7 +141,7 @@ export class ChatMessage {
     meta.createSpan({ cls: "nebi-chat-timestamp", text: "typing..." });
 
     const contentEl = wrapper.createDiv({ cls: "nebi-chat-bubble-content" });
-    void MarkdownRenderer.render(renderComponent, text, contentEl, "");
+    void MarkdownRenderer.render(this.component, text, contentEl, "");
     addCodeBlockCopyButtons(contentEl);
   }
 

@@ -1,0 +1,645 @@
+/* Nebi Chat - Theme-Aware Styles (uses Obsidian CSS variables) */
+
+/* ============================================
+   Main View
+   ============================================ */
+.nebi-chat-view {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+  background-color: var(--background-primary);
+  color: var(--text-normal);
+  font-family: var(--font-interface);
+}
+
+/* ============================================
+   Header
+   ============================================ */
+.nebi-chat-header {
+  padding: var(--size-4-3) var(--size-4-3) var(--size-4-2);
+  border-bottom: 1px solid var(--background-modifier-border);
+  display: flex;
+  flex-direction: column;
+  gap: var(--size-4-2);
+}
+
+.nebi-chat-title-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.nebi-chat-title {
+  font-size: var(--font-ui-small);
+  font-weight: var(--font-bold);
+  color: var(--text-normal);
+}
+
+.nebi-chat-header-btns {
+  display: flex;
+  gap: 2px;
+}
+
+.nebi-chat-conv-row {
+  display: flex;
+  gap: var(--size-4-2);
+  align-items: center;
+}
+
+.nebi-chat-conv-select {
+  flex: 1;
+}
+
+.nebi-chat-conv-delete-btn {
+  flex-shrink: 0;
+}
+
+.nebi-chat-icon-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  border-radius: var(--radius-s);
+  transition: background-color 150ms ease, color 150ms ease;
+}
+
+.nebi-chat-icon-btn:hover {
+  background-color: var(--background-modifier-hover);
+  color: var(--text-normal);
+}
+
+/* ============================================
+   Provider Selector
+   ============================================ */
+.nebi-chat-selector {
+  display: flex;
+  gap: var(--size-4-1);
+}
+
+.nebi-chat-select {
+  flex: 1;
+  background-color: var(--background-secondary);
+  color: var(--text-normal);
+  border: 1px solid var(--background-modifier-border);
+  border-radius: var(--radius-s);
+  padding: var(--size-4-1) var(--size-4-2);
+  font-family: var(--font-interface);
+  font-size: var(--font-ui-smallest);
+  font-weight: var(--font-normal);
+  cursor: pointer;
+  min-width: 0;
+  transition: border-color 150ms ease;
+  appearance: auto;
+}
+
+.nebi-chat-select:hover {
+  border-color: var(--background-modifier-border-hover);
+}
+
+.nebi-chat-select:focus {
+  border-color: var(--interactive-accent);
+  outline: none;
+  box-shadow: 0 0 0 2px color-mix(in oklch, var(--interactive-accent) 25%, transparent);
+}
+
+/* ============================================
+   Messages Area
+   ============================================ */
+.nebi-chat-messages {
+  flex: 1;
+  overflow-y: auto;
+  padding: var(--size-4-3) var(--size-4-3);
+  display: flex;
+  flex-direction: column;
+  gap: var(--size-4-1);
+  scroll-behavior: smooth;
+}
+
+/* ============================================
+   Message Bubble
+   ============================================ */
+.nebi-chat-msg {
+  animation: nebi-fade-in 150ms ease-out;
+}
+
+@keyframes nebi-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.nebi-chat-bubble {
+  padding: var(--size-4-2) var(--size-4-3);
+  border-radius: var(--radius-m);
+  max-width: 100%;
+  position: relative;
+}
+
+.nebi-chat-bubble-user {
+  background-color: var(--background-secondary);
+  border: 1px solid var(--background-modifier-border);
+  margin-left: var(--size-4-4);
+  border-bottom-left-radius: var(--radius-s);
+}
+
+.nebi-chat-bubble-assistant {
+  background-color: var(--background-secondary-alt);
+  border: 1px solid var(--background-modifier-border);
+  margin-right: var(--size-4-4);
+  border-bottom-right-radius: var(--radius-s);
+}
+
+.nebi-chat-bubble-error {
+  background-color: var(--background-modifier-error);
+  border: 1px solid var(--text-error);
+  margin-right: var(--size-4-4);
+}
+
+.nebi-chat-bubble-streaming {
+  border-color: var(--interactive-accent);
+}
+
+/* Bubble header */
+.nebi-chat-bubble-header {
+  display: flex;
+  align-items: center;
+  gap: var(--size-4-2);
+  margin-bottom: var(--size-4-1);
+}
+
+.nebi-chat-avatar {
+  width: var(--size-4-5);
+  height: var(--size-4-5);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  font-weight: var(--font-bold);
+  flex-shrink: 0;
+  line-height: 1;
+  overflow: hidden;
+}
+
+.nebi-chat-avatar svg {
+  width: 100%;
+  height: 100%;
+}
+
+.nebi-chat-avatar-user {
+  background-color: var(--interactive-accent);
+  color: var(--text-on-accent);
+}
+
+.nebi-chat-avatar-ai {
+  background-color: transparent;
+  color: var(--text-on-accent);
+}
+
+.nebi-chat-avatar-error {
+  background-color: var(--text-error);
+  color: var(--text-on-accent);
+}
+
+.nebi-chat-meta {
+  display: flex;
+  align-items: baseline;
+  gap: var(--size-4-1);
+}
+
+.nebi-chat-role-name {
+  font-size: var(--font-ui-smallest);
+  font-weight: var(--font-bold);
+  color: var(--text-normal);
+}
+
+.nebi-chat-timestamp {
+  font-size: var(--font-ui-smallest);
+  color: var(--text-faint);
+}
+
+/* Copy button */
+.nebi-chat-copy-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: auto;
+  opacity: 0;
+  cursor: pointer;
+  color: var(--text-muted);
+  border-radius: var(--radius-s);
+  padding: 2px 4px;
+  transition: opacity 150ms ease, color 150ms ease;
+}
+
+.nebi-chat-msg:hover .nebi-chat-copy-btn {
+  opacity: 1;
+}
+
+.nebi-chat-copy-btn:hover {
+  color: var(--text-normal);
+  background-color: var(--background-modifier-hover);
+}
+
+.nebi-chat-copy-btn-copied {
+  color: var(--text-success) !important;
+}
+
+/* Bubble content */
+.nebi-chat-bubble-content {
+  font-size: var(--font-ui-small);
+  line-height: var(--line-height-normal);
+  color: var(--text-normal);
+  word-break: break-word;
+  user-select: text;
+  -webkit-user-select: text;
+}
+
+.nebi-chat-bubble-content p {
+  margin: 0 0 var(--size-4-1);
+}
+
+.nebi-chat-bubble-content p:last-child {
+  margin-bottom: 0;
+}
+
+/* Inline code */
+.nebi-chat-bubble-content code {
+  background-color: var(--background-modifier-form-field);
+  color: var(--text-accent);
+  padding: 1px var(--size-4-1);
+  border-radius: var(--radius-s);
+  font-family: var(--font-monospace);
+  font-size: var(--font-ui-smallest);
+}
+
+/* Code blocks */
+.nebi-chat-bubble-content pre {
+  background-color: var(--code-background);
+  border: 1px solid var(--background-modifier-border);
+  border-radius: var(--radius-s);
+  padding: var(--size-4-2) var(--size-4-3);
+  overflow-x: auto;
+  margin: var(--size-4-1) 0;
+}
+
+.nebi-chat-bubble-content pre code {
+  background: none;
+  padding: 0;
+  color: var(--code-normal);
+  font-size: var(--font-ui-smallest);
+}
+
+/* Code block copy button */
+.nebi-chat-code-copy-btn {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  background-color: var(--background-modifier-form-field);
+  border: 1px solid var(--background-modifier-border);
+  border-radius: var(--radius-s);
+  color: var(--text-muted);
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 150ms ease;
+}
+
+.nebi-chat-bubble-content pre:hover .nebi-chat-code-copy-btn {
+  opacity: 1;
+}
+
+.nebi-chat-code-copy-btn:hover {
+  color: var(--text-normal);
+  background-color: var(--background-modifier-hover);
+}
+
+.nebi-chat-code-copy-btn-copied {
+  color: var(--text-success) !important;
+}
+
+/* Lists */
+.nebi-chat-bubble-content ul,
+.nebi-chat-bubble-content ol {
+  padding-left: var(--size-4-4);
+  margin: var(--size-4-1) 0;
+}
+
+.nebi-chat-bubble-content li {
+  margin: 2px 0;
+}
+
+/* Bold / Italic */
+.nebi-chat-bubble-content strong {
+  color: var(--text-normal);
+  font-weight: var(--font-bold);
+}
+
+.nebi-chat-bubble-content em {
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+/* Links */
+.nebi-chat-bubble-content a {
+  color: var(--text-accent);
+  text-decoration: none;
+}
+
+.nebi-chat-bubble-content a:hover {
+  color: var(--text-accent-hover);
+  text-decoration: underline;
+}
+
+/* Blockquotes */
+.nebi-chat-bubble-content blockquote {
+  border-left: 3px solid var(--background-modifier-border);
+  padding-left: var(--size-4-2);
+  margin: var(--size-4-1) 0;
+  color: var(--text-muted);
+}
+
+/* Headings */
+.nebi-chat-bubble-content h1,
+.nebi-chat-bubble-content h2,
+.nebi-chat-bubble-content h3 {
+  color: var(--text-normal);
+  font-weight: var(--font-bold);
+  margin: var(--size-4-2) 0 var(--size-4-1);
+}
+
+.nebi-chat-bubble-content h1 { font-size: var(--font-ui-large); }
+.nebi-chat-bubble-content h2 { font-size: var(--font-ui-medium); }
+.nebi-chat-bubble-content h3 { font-size: var(--font-ui-small); }
+
+/* Streaming cursor */
+.nebi-chat-bubble-streaming .nebi-chat-bubble-content::after {
+  content: "\25AE";
+  animation: nebi-blink 1s step-end infinite;
+  color: var(--interactive-accent);
+  margin-left: 2px;
+}
+
+@keyframes nebi-blink {
+  50% { opacity: 0; }
+}
+
+/* Typing indicator dots */
+.nebi-chat-dots {
+  display: flex;
+  gap: 4px;
+  padding: var(--size-4-1) 0;
+}
+
+.nebi-chat-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background-color: var(--text-muted);
+  animation: nebi-dot-pulse 1.4s ease-in-out infinite;
+}
+
+.nebi-chat-dot:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.nebi-chat-dot:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+@keyframes nebi-dot-pulse {
+  0%, 80%, 100% {
+    transform: scale(0.7);
+    opacity: 0.4;
+  }
+  40% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* ============================================
+   Empty State
+   ============================================ */
+.nebi-chat-empty {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--size-4-8) var(--size-4-6);
+  text-align: center;
+}
+
+.nebi-chat-empty-logo {
+  width: 48px;
+  height: 48px;
+  border-radius: var(--radius-m);
+  background-color: var(--interactive-accent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  font-weight: var(--font-bold);
+  color: var(--text-on-accent);
+  margin-bottom: var(--size-4-3);
+  overflow: hidden;
+}
+
+.nebi-chat-empty-logo svg {
+  width: 100%;
+  height: 100%;
+}
+
+.nebi-chat-empty-title {
+  font-size: var(--font-ui-large);
+  font-weight: var(--font-bold);
+  color: var(--text-normal);
+  margin-bottom: var(--size-4-1);
+}
+
+.nebi-chat-empty-desc {
+  font-size: var(--font-ui-small);
+  color: var(--text-muted);
+  max-width: 240px;
+  line-height: var(--line-height-normal);
+  margin-bottom: var(--size-4-5);
+}
+
+.nebi-chat-empty-prompts {
+  display: flex;
+  flex-direction: column;
+  gap: var(--size-4-1);
+  width: 100%;
+  max-width: 240px;
+}
+
+.nebi-chat-empty-prompt {
+  background-color: var(--background-secondary);
+  border: 1px solid var(--background-modifier-border);
+  border-radius: var(--radius-s);
+  color: var(--text-muted);
+  font-family: var(--font-interface);
+  font-size: var(--font-ui-smallest);
+  padding: var(--size-4-2) var(--size-4-3);
+  cursor: pointer;
+  text-align: left;
+  transition: background-color 150ms ease, border-color 150ms ease, color 150ms ease;
+}
+
+.nebi-chat-empty-prompt:hover {
+  background-color: var(--background-modifier-hover);
+  color: var(--text-normal);
+  border-color: var(--interactive-accent);
+}
+
+/* ============================================
+   Input Area
+   ============================================ */
+.nebi-chat-input-area {
+  padding: var(--size-4-2) var(--size-4-3) var(--size-4-3);
+  border-top: 1px solid var(--background-modifier-border);
+  display: flex;
+  flex-direction: column;
+  gap: var(--size-4-1);
+}
+
+.nebi-chat-input-wrapper {
+  display: flex;
+  align-items: flex-end;
+  background-color: var(--background-secondary);
+  border: 1px solid var(--background-modifier-border);
+  border-radius: var(--radius-m);
+  padding: var(--size-4-1);
+  transition: border-color 150ms ease, box-shadow 150ms ease;
+}
+
+.nebi-chat-input-wrapper:focus-within {
+  border-color: var(--interactive-accent);
+  box-shadow: 0 0 0 2px color-mix(in oklch, var(--interactive-accent) 20%, transparent);
+}
+
+.nebi-chat-textarea {
+  flex: 1;
+  background: none;
+  color: var(--text-normal);
+  border: none;
+  padding: var(--size-4-1) var(--size-4-2);
+  font-family: var(--font-interface);
+  font-size: var(--font-ui-small);
+  line-height: var(--line-height-normal);
+  resize: none;
+  min-height: 22px;
+  max-height: 120px;
+  outline: none;
+}
+
+.nebi-chat-textarea::placeholder {
+  color: var(--text-faint);
+}
+
+.nebi-chat-textarea:disabled {
+  opacity: 0.5;
+}
+
+.nebi-chat-input-btns {
+  display: flex;
+  gap: 2px;
+  padding: 2px;
+}
+
+.nebi-chat-send-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  background-color: var(--interactive-accent);
+  color: var(--text-on-accent);
+  border: none;
+  border-radius: var(--radius-s);
+  cursor: pointer;
+  transition: background-color 150ms ease;
+  flex-shrink: 0;
+}
+
+.nebi-chat-send-btn:hover {
+  background-color: var(--interactive-accent-hover);
+}
+
+.nebi-chat-send-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.4;
+}
+
+.nebi-chat-stop-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  background-color: var(--text-error);
+  color: var(--text-on-accent);
+  border: none;
+  border-radius: var(--radius-s);
+  cursor: pointer;
+  transition: background-color 150ms ease;
+  flex-shrink: 0;
+}
+
+.nebi-chat-stop-btn:hover {
+  background-color: var(--background-modifier-error-hover);
+}
+
+.nebi-chat-hint {
+  font-size: var(--font-ui-smallest);
+  color: var(--text-faint);
+  text-align: center;
+}
+
+/* ============================================
+   Scrollbar
+   ============================================ */
+.nebi-chat-messages::-webkit-scrollbar {
+  width: var(--scrollbar-width);
+}
+
+.nebi-chat-messages::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.nebi-chat-messages::-webkit-scrollbar-thumb {
+  background-color: var(--background-modifier-border);
+  border-radius: 3px;
+}
+
+.nebi-chat-messages::-webkit-scrollbar-thumb:hover {
+  background-color: var(--background-modifier-border-hover);
+}
+
+/* ============================================
+   Responsive
+   ============================================ */
+@media (max-width: 400px) {
+  .nebi-chat-empty-title {
+    font-size: var(--font-ui-medium);
+  }
+  .nebi-chat-empty-desc {
+    font-size: var(--font-ui-smallest);
+  }
+}

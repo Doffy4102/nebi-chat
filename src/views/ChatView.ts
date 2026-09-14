@@ -79,21 +79,21 @@ export class ChatView extends ItemView {
       cls: "nebi-chat-icon-btn",
       attr: { "aria-label": "New chat", title: "New chat" },
     });
-    this.newChatBtnEl.innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>`;
+    this.newChatBtnEl.innerHTML = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>`;
     this.newChatBtnEl.addEventListener("click", () => this.createNewChat());
 
     this.exportBtnEl = headerBtns.createEl("button", {
       cls: "nebi-chat-icon-btn",
       attr: { "aria-label": "Export chat", title: "Export to markdown" },
     });
-    this.exportBtnEl.innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>`;
+    this.exportBtnEl.innerHTML = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>`;
     this.exportBtnEl.addEventListener("click", () => this.exportChat());
 
     this.refreshBtnEl = headerBtns.createEl("button", {
       cls: "nebi-chat-icon-btn",
       attr: { "aria-label": "Refresh settings", title: "Refresh settings" },
     });
-    this.refreshBtnEl.innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>`;
+    this.refreshBtnEl.innerHTML = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>`;
     this.refreshBtnEl.addEventListener("click", () => {
       void this.reloadPlugin();
     });
@@ -102,7 +102,7 @@ export class ChatView extends ItemView {
       cls: "nebi-chat-icon-btn",
       attr: { "aria-label": "Clear chat", title: "Clear chat" },
     });
-    this.clearBtnEl.innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>`;
+    this.clearBtnEl.innerHTML = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>`;
     this.clearBtnEl.addEventListener("click", () => {
       void this.clearChat();
     });
@@ -118,7 +118,7 @@ export class ChatView extends ItemView {
       cls: "nebi-chat-icon-btn nebi-chat-conv-delete-btn",
       attr: { "aria-label": "Delete conversation", title: "Delete conversation" },
     });
-    deleteConvBtn.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>`;
+    deleteConvBtn.innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>`;
     deleteConvBtn.addEventListener("click", () => {
       void this.deleteCurrentConversation();
     });
@@ -195,7 +195,7 @@ export class ChatView extends ItemView {
     this.debouncedSave();
     this.renderMessages();
 
-    this.typingIndicator = new ChatMessage(this.chatContainerEl!, this);
+    this.typingIndicator = new ChatMessage(this.chatContainerEl!);
     this.typingIndicator.renderTypingIndicator();
     this.scrollToBottom();
 
@@ -226,7 +226,7 @@ export class ChatView extends ItemView {
         fullResponse += chunk;
 
         if (!streamingMsg) {
-          streamingMsg = new ChatMessage(this.chatContainerEl!, this);
+          streamingMsg = new ChatMessage(this.chatContainerEl!);
           streamingMsg.renderStreaming(fullResponse);
           this.scrollToBottom();
         } else {
@@ -274,7 +274,7 @@ export class ChatView extends ItemView {
           this.typingIndicator = null;
         }
 
-        const errorComp = new ChatMessage(this.chatContainerEl!, this);
+        const errorComp = new ChatMessage(this.chatContainerEl!);
         errorComp.renderError(errMsg);
         this.scrollToBottom();
       }
@@ -357,7 +357,7 @@ export class ChatView extends ItemView {
     }
 
     for (const message of this.messages) {
-      const msgComponent = new ChatMessage(this.chatContainerEl, this);
+      const msgComponent = new ChatMessage(this.chatContainerEl);
       msgComponent.render(message);
     }
 

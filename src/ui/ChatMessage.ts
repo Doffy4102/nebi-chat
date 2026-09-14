@@ -8,6 +8,8 @@ function createSvgIcon(parent: HTMLElement, svgContent: string): HTMLElement {
   return wrapper;
 }
 
+const renderComponent = new Component();
+
 function addCodeBlockCopyButtons(container: HTMLElement): void {
   const pres = container.querySelectorAll("pre");
   for (const pre of Array.from(pres)) {
@@ -54,11 +56,9 @@ function formatRelativeTime(timestamp: number): string {
 
 export class ChatMessage {
   private containerEl: HTMLElement;
-  private component: Component;
 
-  constructor(parentEl: HTMLElement, component: Component) {
+  constructor(parentEl: HTMLElement) {
     this.containerEl = parentEl.createDiv({ cls: "nebi-chat-msg" });
-    this.component = component;
   }
 
   render(messageOrContent: Message | string, role?: string): void {
@@ -112,7 +112,7 @@ export class ChatMessage {
     const contentEl = wrapper.createDiv({ cls: "nebi-chat-bubble-content" });
 
     if (message.role === "assistant") {
-      void MarkdownRenderer.render(this.component, message.content, contentEl, "");
+      void MarkdownRenderer.render(renderComponent, message.content, contentEl, "");
       addCodeBlockCopyButtons(contentEl);
     } else {
       contentEl.setText(message.content);
@@ -128,14 +128,14 @@ export class ChatMessage {
 
     const headerRow = wrapper.createDiv({ cls: "nebi-chat-bubble-header" });
     const avatar = headerRow.createDiv({ cls: "nebi-chat-avatar nebi-chat-avatar-ai" });
-    avatar.setText("N");
+    createSvgIcon(avatar, NEBI_ICON_SVG);
 
     const meta = headerRow.createDiv({ cls: "nebi-chat-meta" });
     meta.createSpan({ cls: "nebi-chat-role-name", text: "Nebi" });
     meta.createSpan({ cls: "nebi-chat-timestamp", text: "typing..." });
 
     const contentEl = wrapper.createDiv({ cls: "nebi-chat-bubble-content" });
-    void MarkdownRenderer.render(this.component, text, contentEl, "");
+    void MarkdownRenderer.render(renderComponent, text, contentEl, "");
     addCodeBlockCopyButtons(contentEl);
   }
 
@@ -148,7 +148,7 @@ export class ChatMessage {
 
     const headerRow = wrapper.createDiv({ cls: "nebi-chat-bubble-header" });
     const avatar = headerRow.createDiv({ cls: "nebi-chat-avatar nebi-chat-avatar-ai" });
-    avatar.setText("N");
+    createSvgIcon(avatar, NEBI_ICON_SVG);
 
     const meta = headerRow.createDiv({ cls: "nebi-chat-meta" });
     meta.createSpan({ cls: "nebi-chat-role-name", text: "Nebi" });

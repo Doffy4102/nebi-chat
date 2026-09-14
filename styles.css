@@ -1,7 +1,7 @@
 /* Nebi Chat - Theme-Aware Styles (uses Obsidian CSS variables) */
 
-.nebi-chat-hidden {
-  display: none !important;
+.nebi-chat-hidden.nebi-chat-hidden {
+  display: none;
 }
 
 /* ============================================
@@ -256,8 +256,8 @@
   background-color: var(--background-modifier-hover);
 }
 
-.nebi-chat-copy-btn-copied {
-  color: var(--text-success) !important;
+.nebi-chat-msg .nebi-chat-copy-btn.nebi-chat-copy-btn-copied {
+  color: var(--text-success);
 }
 
 /* Bubble content */
@@ -333,8 +333,8 @@
   background-color: var(--background-modifier-hover);
 }
 
-.nebi-chat-code-copy-btn-copied {
-  color: var(--text-success) !important;
+.nebi-chat-bubble-content .nebi-chat-code-copy-btn.nebi-chat-code-copy-btn-copied {
+  color: var(--text-success);
 }
 
 /* Lists */

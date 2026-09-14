@@ -28,27 +28,45 @@ export class ChatInput {
       },
     });
 
-    // Button group inside input wrapper
     const btnGroup = this.inputWrapper.createDiv({ cls: "nebi-chat-input-btns" });
 
     this.sendBtnEl = btnGroup.createEl("button", {
       cls: "nebi-chat-send-btn",
       attr: { "aria-label": "Send message" },
     });
-    this.sendBtnEl.innerHTML = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>`;
+    this.sendBtnEl.createEl("svg", {
+      attr: {
+        width: "20",
+        height: "20",
+        viewBox: "0 0 24 24",
+        fill: "none",
+        stroke: "currentColor",
+        "stroke-width": "2",
+        "stroke-linecap": "round",
+        "stroke-linejoin": "round",
+      },
+    }).createEl("path", {
+      attr: { d: "M22 2L11 13M22 2L15 22L11 13L2 9L22 2Z" },
+    });
 
     this.stopBtnEl = btnGroup.createEl("button", {
-      cls: "nebi-chat-stop-btn",
+      cls: "nebi-chat-stop-btn nebi-chat-hidden",
       attr: { "aria-label": "Stop generation" },
     });
-    this.stopBtnEl.innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><rect x="4" y="4" width="16" height="16" rx="2"></rect></svg>`;
-    this.stopBtnEl.style.display = "none";
+    this.stopBtnEl.createEl("svg", {
+      attr: {
+        width: "18",
+        height: "18",
+        viewBox: "0 0 24 24",
+        fill: "currentColor",
+      },
+    }).createEl("rect", {
+      attr: { x: "4", y: "4", width: "16", height: "16", rx: "2" },
+    });
 
-    // Hint row
     this.hintEl = this.containerEl.createDiv({ cls: "nebi-chat-hint" });
     this.hintEl.setText("Enter to send \u00B7 Shift+Enter for new line");
 
-    // Event listeners
     this.sendBtnEl.addEventListener("click", () => this.handleSend());
     this.stopBtnEl.addEventListener("click", () => {
       this.onStop();
@@ -61,7 +79,6 @@ export class ChatInput {
       }
     });
 
-    // Auto-resize textarea
     this.textArea.addEventListener("input", () => {
       this.textArea.style.height = "auto";
       this.textArea.style.height = Math.min(this.textArea.scrollHeight, 120) + "px";
@@ -79,8 +96,13 @@ export class ChatInput {
 
   setGenerating(generating: boolean): void {
     this.isGenerating = generating;
-    this.sendBtnEl.style.display = generating ? "none" : "flex";
-    this.stopBtnEl.style.display = generating ? "flex" : "none";
+    if (generating) {
+      this.sendBtnEl.addClass("nebi-chat-hidden");
+      this.stopBtnEl.removeClass("nebi-chat-hidden");
+    } else {
+      this.sendBtnEl.removeClass("nebi-chat-hidden");
+      this.stopBtnEl.addClass("nebi-chat-hidden");
+    }
     this.textArea.disabled = generating;
     this.textArea.placeholder = generating ? "Generating..." : "Ask Nebi anything...";
     if (!generating) {

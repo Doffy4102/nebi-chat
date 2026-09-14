@@ -1,11 +1,11 @@
-import { Modal, Setting } from "obsidian";
+import { App, Modal, Setting } from "obsidian";
 
 export class ConfirmModal extends Modal {
   private title: string;
   private message: string;
   private resolve!: (value: boolean) => void;
 
-  constructor(title: string, message: string) {
+  constructor(app: App, title: string, message: string) {
     super(app);
     this.title = title;
     this.message = message;
@@ -37,8 +37,8 @@ export class ConfirmModal extends Modal {
       .addButton((btn) =>
         btn
           .setButtonText("Confirm")
+          .setDestructive()
           .setCta()
-          .setWarning()
           .onClick(() => {
             this.resolve(true);
             this.close();

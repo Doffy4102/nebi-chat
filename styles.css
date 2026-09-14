@@ -1,5 +1,9 @@
 /* Nebi Chat - Theme-Aware Styles (uses Obsidian CSS variables) */
 
+.nebi-chat-hidden {
+  display: none !important;
+}
+
 /* ============================================
    Main View
    ============================================ */

@@ -1,3 +1,4 @@
+import { requestUrl } from "obsidian";
 import { AIProvider, ChatRequest, ModelInfo } from "../../types";
 import { parseSSEStream } from "../StreamingParser";
 
@@ -12,19 +13,19 @@ export abstract class BaseProvider implements AIProvider {
   protected temperature: number = 0.7;
   protected maxTokens: number = 4096;
 
-  setApiKey(key: string) {
+  setApiKey(key: string): void {
     this.apiKey = key;
   }
 
-  setBaseUrl(url: string) {
+  setBaseUrl(url: string): void {
     this.baseUrl = url;
   }
 
-  setTemperature(temp: number) {
+  setTemperature(temp: number): void {
     this.temperature = temp;
   }
 
-  setMaxTokens(tokens: number) {
+  setMaxTokens(tokens: number): void {
     this.maxTokens = tokens;
   }
 
@@ -85,13 +86,15 @@ export abstract class BaseProvider implements AIProvider {
       if (signal) {
         fetchOptions.signal = signal;
       }
+      // Streaming requires native fetch — requestUrl does not support SSE
       res = await fetch(url, fetchOptions);
-    } catch (err: any) {
-      if (err.name === "AbortError") {
+    } catch (err: unknown) {
+      const e = err as { name?: string; message?: string };
+      if (e.name === "AbortError") {
         throw err;
       }
       console.error(`[Nebi Chat] ${this.name} fetch error:`, err);
-      throw new Error(`[${this.name}] Network error: ${err.message || err}`);
+      throw new Error(`[${this.name}] Network error: ${e.message || String(err)}`);
     }
 
     if (!res.ok) {
@@ -104,7 +107,6 @@ export abstract class BaseProvider implements AIProvider {
       throw new Error(`[${this.name}] No response body`);
     }
 
-    // Parse SSE stream
     const reader = res.body.getReader();
     const decoder = new TextDecoder();
 
@@ -115,8 +117,9 @@ export abstract class BaseProvider implements AIProvider {
           yield chunk.content;
         }
       }
-    } catch (err: any) {
-      if (err.name === "AbortError") {
+    } catch (err: unknown) {
+      const e = err as { name?: string };
+      if (e.name === "AbortError") {
         throw err;
       }
       throw err;
@@ -134,13 +137,12 @@ export abstract class BaseProvider implements AIProvider {
     }
 
     try {
-      const res = await fetch(url, { headers });
-      if (!res.ok) return this.models;
+      const res = await requestUrl({ url, method: "GET", headers });
+      if (res.status < 200 || res.status >= 300) return this.models;
 
-      const data = await res.json();
+      const data: { data?: Array<{ id: string; context_window?: number }> } = res.json;
       const models: ModelInfo[] = [];
 
-      // OpenAI-compatible format: { data: [{ id, ... }] }
       if (data.data && Array.isArray(data.data)) {
         for (const m of data.data) {
           if (m.id) {
@@ -157,7 +159,7 @@ export abstract class BaseProvider implements AIProvider {
       if (models.length > 0) {
         return models;
       }
-    } catch (err) {
+    } catch (err: unknown) {
       console.warn(`[Nebi Chat] ${this.name} model discovery failed:`, err);
     }
 

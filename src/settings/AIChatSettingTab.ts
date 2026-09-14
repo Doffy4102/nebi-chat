@@ -1,4 +1,4 @@
-import { App, Notice, PluginSettingTab, Setting } from "obsidian";
+import { Notice, PluginSettingTab, Setting, requestUrl } from "obsidian";
 import { DEFAULT_SETTINGS } from "../types";
 import type AIChatPlugin from "../main";
 import { ConfirmModal } from "../ui/ConfirmModal";
@@ -6,7 +6,7 @@ import { ConfirmModal } from "../ui/ConfirmModal";
 export class AIChatSettingTab extends PluginSettingTab {
   plugin: AIChatPlugin;
 
-  constructor(app: App, plugin: AIChatPlugin) {
+  constructor(app: AIChatPlugin["app"], plugin: AIChatPlugin) {
     super(app, plugin);
     this.plugin = plugin;
   }
@@ -15,10 +15,9 @@ export class AIChatSettingTab extends PluginSettingTab {
     const { containerEl } = this;
     containerEl.empty();
 
-    containerEl.createEl("h2", { text: "Nebi Chat Settings" });
+    new Setting(containerEl).setName("Nebi Chat Settings").setHeading();
 
-    // Provider settings
-    containerEl.createEl("h3", { text: "Providers" });
+    new Setting(containerEl).setName("Providers").setHeading();
 
     const providers = [
       {
@@ -84,12 +83,17 @@ export class AIChatSettingTab extends PluginSettingTab {
 
             try {
               const baseUrl = config?.baseUrl || "";
-              const res = await fetch(`${baseUrl}/chat/completions`, {
+              const headers: Record<string, string> = {
+                "Content-Type": "application/json",
+              };
+              if (apiKey) {
+                headers["Authorization"] = `Bearer ${apiKey}`;
+              }
+
+              const res = await requestUrl({
+                url: `${baseUrl}/chat/completions`,
                 method: "POST",
-                headers: {
-                  "Content-Type": "application/json",
-                  ...(apiKey ? { "Authorization": `Bearer ${apiKey}` } : {}),
-                },
+                headers,
                 body: JSON.stringify({
                   model,
                   messages: [{ role: "user", content: "hi" }],
@@ -97,15 +101,16 @@ export class AIChatSettingTab extends PluginSettingTab {
                 }),
               });
 
-              if (res.ok) {
+              if (res.status >= 200 && res.status < 300) {
                 new Notice(`✓ ${provider.name} connected successfully`);
               } else {
-                const err = await res.text().catch(() => "Unknown error");
+                const err = res.text || "Unknown error";
                 new Notice(`✗ ${provider.name}: HTTP ${res.status}`);
                 console.error(`[Nebi Chat] Test failed for ${provider.name}:`, err);
               }
-            } catch (e: any) {
-              new Notice(`✗ ${provider.name}: ${e.message || "Connection failed"}`);
+            } catch (e: unknown) {
+              const msg = e instanceof Error ? e.message : "Connection failed";
+              new Notice(`✗ ${provider.name}: ${msg}`);
             } finally {
               btn.setButtonText("Test");
               btn.setDisabled(false);
@@ -114,8 +119,7 @@ export class AIChatSettingTab extends PluginSettingTab {
         });
     }
 
-    // Default provider
-    containerEl.createEl("h3", { text: "General" });
+    new Setting(containerEl).setName("General").setHeading();
 
     new Setting(containerEl)
       .setName("Default Provider")
@@ -131,7 +135,6 @@ export class AIChatSettingTab extends PluginSettingTab {
         });
       });
 
-    // System prompt
     new Setting(containerEl)
       .setName("System Prompt")
       .setDesc("Instructions for the AI assistant")
@@ -145,7 +148,6 @@ export class AIChatSettingTab extends PluginSettingTab {
           })
       );
 
-    // Max tokens
     new Setting(containerEl)
       .setName("Max Tokens")
       .setDesc("Maximum tokens per response")
@@ -153,14 +155,12 @@ export class AIChatSettingTab extends PluginSettingTab {
         slider
           .setLimits(256, 32768, 256)
           .setValue(this.plugin.settings.maxTokens)
-          .setDynamicTooltip()
           .onChange(async (value) => {
             this.plugin.settings.maxTokens = value;
             await this.plugin.settings.save();
           })
       );
 
-    // Temperature
     new Setting(containerEl)
       .setName("Temperature")
       .setDesc("Randomness of responses (0 = deterministic, 2 = creative)")
@@ -168,32 +168,28 @@ export class AIChatSettingTab extends PluginSettingTab {
         slider
           .setLimits(0, 2, 0.1)
           .setValue(this.plugin.settings.temperature)
-          .setDynamicTooltip()
           .onChange(async (value) => {
             this.plugin.settings.temperature = value;
             await this.plugin.settings.save();
           })
       );
 
-    // Reset to defaults
     new Setting(containerEl)
       .setName("Reset to Defaults")
       .setDesc("Restore all settings to their defaults (API keys are preserved)")
       .addButton((btn) =>
         btn.setButtonText("Reset").onClick(async () => {
           const confirmed = await new ConfirmModal(
+            this.app,
             "Reset Settings",
             "Reset all settings to defaults? API keys will be preserved."
           ).openAndWait();
           if (!confirmed) return;
-          // Preserve API keys
           const apiKeys: Record<string, string> = {};
           for (const [id, config] of Object.entries(this.plugin.settings.data_.providers)) {
             apiKeys[id] = config.apiKey;
           }
-          // Reset to defaults
           Object.assign(this.plugin.settings.data_, DEFAULT_SETTINGS);
-          // Restore API keys
           for (const [id, key] of Object.entries(apiKeys)) {
             this.plugin.settings.setProvider(id, { apiKey: key });
           }

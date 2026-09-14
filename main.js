@@ -22,7 +22,7 @@ __export(main_exports, {
   default: () => AIChatPlugin
 });
 module.exports = __toCommonJS(main_exports);
-var import_obsidian5 = require("obsidian");
+var import_obsidian6 = require("obsidian");
 
 // src/views/ChatView.ts
 var import_obsidian3 = require("obsidian");
@@ -277,6 +277,11 @@ var NEBI_ICON_SVG = `<svg viewBox="0 0 500 500" xmlns="http://www.w3.org/2000/sv
 </svg>`;
 
 // src/ui/ChatMessage.ts
+function createSvgIcon(parent, svgContent) {
+  const wrapper = parent.createDiv({ cls: "nebi-chat-icon-wrapper" });
+  wrapper.innerHTML = svgContent;
+  return wrapper;
+}
 function addCodeBlockCopyButtons(container) {
   const pres = container.querySelectorAll("pre");
   for (const pre of Array.from(pres)) {
@@ -287,17 +292,19 @@ function addCodeBlockCopyButtons(container) {
       cls: "nebi-chat-code-copy-btn",
       attr: { "aria-label": "Copy code" }
     });
-    btn.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>`;
+    const copyIcon = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>`;
+    const checkIcon = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>`;
+    btn.innerHTML = copyIcon;
     btn.addEventListener("click", async () => {
       const code = pre.querySelector("code");
       const text = code ? code.textContent || "" : pre.textContent || "";
       try {
         await navigator.clipboard.writeText(text);
         btn.addClass("nebi-chat-code-copy-btn-copied");
-        btn.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>`;
-        setTimeout(() => {
+        btn.innerHTML = checkIcon;
+        window.setTimeout(() => {
           btn.removeClass("nebi-chat-code-copy-btn-copied");
-          btn.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>`;
+          btn.innerHTML = copyIcon;
         }, 1500);
       } catch (e) {
       }
@@ -340,7 +347,7 @@ var ChatMessage = class {
       avatar.setText("U");
       avatar.addClass("nebi-chat-avatar-user");
     } else {
-      avatar.innerHTML = NEBI_ICON_SVG;
+      createSvgIcon(avatar, NEBI_ICON_SVG);
       avatar.addClass("nebi-chat-avatar-ai");
     }
     const meta = headerRow.createDiv({ cls: "nebi-chat-meta" });
@@ -348,22 +355,24 @@ var ChatMessage = class {
     meta.createSpan({ cls: "nebi-chat-role-name", text: roleName });
     meta.createSpan({ cls: "nebi-chat-timestamp", text: formatRelativeTime(message.timestamp) });
     const copyBtn = headerRow.createDiv({ cls: "nebi-chat-copy-btn", attr: { "aria-label": "Copy message" } });
-    copyBtn.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>`;
+    const copySvg = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>`;
+    const checkSvg = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>`;
+    copyBtn.innerHTML = copySvg;
     copyBtn.addEventListener("click", async () => {
       try {
         await navigator.clipboard.writeText(message.content);
         copyBtn.addClass("nebi-chat-copy-btn-copied");
-        copyBtn.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>`;
-        setTimeout(() => {
+        copyBtn.innerHTML = checkSvg;
+        window.setTimeout(() => {
           copyBtn.removeClass("nebi-chat-copy-btn-copied");
-          copyBtn.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>`;
+          copyBtn.innerHTML = copySvg;
         }, 1500);
       } catch (e) {
       }
     });
     const contentEl = wrapper.createDiv({ cls: "nebi-chat-bubble-content" });
     if (message.role === "assistant") {
-      import_obsidian.MarkdownRenderer.renderMarkdown(message.content, contentEl, "", null);
+      void import_obsidian.MarkdownRenderer.render(message.content, contentEl, "", this);
       addCodeBlockCopyButtons(contentEl);
     } else {
       contentEl.setText(message.content);
@@ -381,7 +390,7 @@ var ChatMessage = class {
     meta.createSpan({ cls: "nebi-chat-role-name", text: "Nebi" });
     meta.createSpan({ cls: "nebi-chat-timestamp", text: "typing..." });
     const contentEl = wrapper.createDiv({ cls: "nebi-chat-bubble-content" });
-    import_obsidian.MarkdownRenderer.renderMarkdown(text, contentEl, "", null);
+    void import_obsidian.MarkdownRenderer.render(text, contentEl, "", this);
     addCodeBlockCopyButtons(contentEl);
   }
   renderTypingIndicator() {
@@ -441,13 +450,34 @@ var ChatInput = class {
       cls: "nebi-chat-send-btn",
       attr: { "aria-label": "Send message" }
     });
-    this.sendBtnEl.innerHTML = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>`;
+    this.sendBtnEl.createEl("svg", {
+      attr: {
+        width: "20",
+        height: "20",
+        viewBox: "0 0 24 24",
+        fill: "none",
+        stroke: "currentColor",
+        "stroke-width": "2",
+        "stroke-linecap": "round",
+        "stroke-linejoin": "round"
+      }
+    }).createEl("path", {
+      attr: { d: "M22 2L11 13M22 2L15 22L11 13L2 9L22 2Z" }
+    });
     this.stopBtnEl = btnGroup.createEl("button", {
-      cls: "nebi-chat-stop-btn",
+      cls: "nebi-chat-stop-btn nebi-chat-hidden",
       attr: { "aria-label": "Stop generation" }
     });
-    this.stopBtnEl.innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><rect x="4" y="4" width="16" height="16" rx="2"></rect></svg>`;
-    this.stopBtnEl.style.display = "none";
+    this.stopBtnEl.createEl("svg", {
+      attr: {
+        width: "18",
+        height: "18",
+        viewBox: "0 0 24 24",
+        fill: "currentColor"
+      }
+    }).createEl("rect", {
+      attr: { x: "4", y: "4", width: "16", height: "16", rx: "2" }
+    });
     this.hintEl = this.containerEl.createDiv({ cls: "nebi-chat-hint" });
     this.hintEl.setText("Enter to send \xB7 Shift+Enter for new line");
     this.sendBtnEl.addEventListener("click", () => this.handleSend());
@@ -475,8 +505,13 @@ var ChatInput = class {
   }
   setGenerating(generating) {
     this.isGenerating = generating;
-    this.sendBtnEl.style.display = generating ? "none" : "flex";
-    this.stopBtnEl.style.display = generating ? "flex" : "none";
+    if (generating) {
+      this.sendBtnEl.addClass("nebi-chat-hidden");
+      this.stopBtnEl.removeClass("nebi-chat-hidden");
+    } else {
+      this.sendBtnEl.removeClass("nebi-chat-hidden");
+      this.stopBtnEl.addClass("nebi-chat-hidden");
+    }
     this.textArea.disabled = generating;
     this.textArea.placeholder = generating ? "Generating..." : "Ask Nebi anything...";
     if (!generating) {
@@ -570,7 +605,7 @@ var ProviderSelector = class {
 // src/ui/ConfirmModal.ts
 var import_obsidian2 = require("obsidian");
 var ConfirmModal = class extends import_obsidian2.Modal {
-  constructor(title, message) {
+  constructor(app, title, message) {
     super(app);
     this.title = title;
     this.message = message;
@@ -592,7 +627,7 @@ var ConfirmModal = class extends import_obsidian2.Modal {
         this.close();
       })
     ).addButton(
-      (btn) => btn.setButtonText("Confirm").setCta().setWarning().onClick(() => {
+      (btn) => btn.setButtonText("Confirm").setDestructive().setCta().onClick(() => {
         this.resolve(true);
         this.close();
       })
@@ -609,6 +644,11 @@ var VIEW_TYPE_NEBI_CHAT = "nebi-chat-view";
 var MAX_HISTORY = 200;
 function generateId() {
   return Date.now().toString(36) + Math.random().toString(36).substring(2, 8);
+}
+function createSvgIcon2(parent, svgContent) {
+  const wrapper = parent.createDiv({ cls: "nebi-chat-icon-wrapper" });
+  wrapper.innerHTML = svgContent;
+  return wrapper;
 }
 var ChatView = class extends import_obsidian3.ItemView {
   constructor(leaf, providerManager, settings) {
@@ -664,13 +704,17 @@ var ChatView = class extends import_obsidian3.ItemView {
       attr: { "aria-label": "Refresh settings", title: "Refresh settings" }
     });
     this.refreshBtnEl.innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>`;
-    this.refreshBtnEl.addEventListener("click", () => this.reloadPlugin());
+    this.refreshBtnEl.addEventListener("click", () => {
+      void this.reloadPlugin();
+    });
     this.clearBtnEl = headerBtns.createEl("button", {
       cls: "nebi-chat-icon-btn",
       attr: { "aria-label": "Clear chat", title: "Clear chat" }
     });
     this.clearBtnEl.innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>`;
-    this.clearBtnEl.addEventListener("click", () => this.clearChat());
+    this.clearBtnEl.addEventListener("click", () => {
+      void this.clearChat();
+    });
     const convRow = headerEl.createDiv({ cls: "nebi-chat-conv-row" });
     this.conversationSelect = convRow.createEl("select", { cls: "nebi-chat-select nebi-chat-conv-select" });
     this.populateConversationSelect();
@@ -682,7 +726,9 @@ var ChatView = class extends import_obsidian3.ItemView {
       attr: { "aria-label": "Delete conversation", title: "Delete conversation" }
     });
     deleteConvBtn.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>`;
-    deleteConvBtn.addEventListener("click", () => this.deleteCurrentConversation());
+    deleteConvBtn.addEventListener("click", () => {
+      void this.deleteCurrentConversation();
+    });
     this.selector = new ProviderSelector(
       headerEl,
       (providerId) => this.handleProviderChange(providerId),
@@ -697,7 +743,9 @@ var ChatView = class extends import_obsidian3.ItemView {
     this.chatContainerEl = container.createDiv({ cls: "nebi-chat-messages" });
     this.inputArea = new ChatInput(
       container,
-      (text) => this.handleSendMessage(text),
+      (text) => {
+        void this.handleSendMessage(text);
+      },
       () => this.handleStopGeneration()
     );
     if (this.messages.length === 0) {
@@ -713,17 +761,17 @@ var ChatView = class extends import_obsidian3.ItemView {
       this.abortController = null;
     }
     if (this.streamingDebounceTimer) {
-      clearTimeout(this.streamingDebounceTimer);
+      window.clearTimeout(this.streamingDebounceTimer);
       this.streamingDebounceTimer = null;
     }
     if (this.lastSaveTimer) {
-      clearTimeout(this.lastSaveTimer);
+      window.clearTimeout(this.lastSaveTimer);
       this.lastSaveTimer = null;
     }
   }
   handleProviderChange(providerId) {
     this.settings.activeProvider = providerId;
-    this.settings.save();
+    void this.settings.save();
     this.providerManager.applySettings();
     const config = this.settings.getProvider(providerId);
     if (config && this.selector) {
@@ -732,7 +780,7 @@ var ChatView = class extends import_obsidian3.ItemView {
   }
   handleModelChange(modelId) {
     this.settings.setProvider(this.settings.activeProvider, { selectedModel: modelId });
-    this.settings.save();
+    void this.settings.save();
   }
   async handleSendMessage(text) {
     var _a, _b;
@@ -774,13 +822,13 @@ var ChatView = class extends import_obsidian3.ItemView {
           this.scrollToBottom();
         } else {
           if (this.streamingDebounceTimer) {
-            clearTimeout(this.streamingDebounceTimer);
+            window.clearTimeout(this.streamingDebounceTimer);
           }
-          this.streamingDebounceTimer = setTimeout(flushStreaming, 150);
+          this.streamingDebounceTimer = window.setTimeout(flushStreaming, 150);
         }
       }
       if (this.streamingDebounceTimer) {
-        clearTimeout(this.streamingDebounceTimer);
+        window.clearTimeout(this.streamingDebounceTimer);
         this.streamingDebounceTimer = null;
       }
       if (fullResponse && streamingMsg) {
@@ -794,7 +842,8 @@ var ChatView = class extends import_obsidian3.ItemView {
         this.debouncedSave();
       }
     } catch (error) {
-      if (error.name === "AbortError") {
+      const err = error;
+      if (err.name === "AbortError") {
         if (fullResponse && streamingMsg) {
           this.messages.push({
             role: "assistant",
@@ -805,7 +854,7 @@ var ChatView = class extends import_obsidian3.ItemView {
           this.debouncedSave();
         }
       } else {
-        const errMsg = error.message || String(error);
+        const errMsg = err.message || String(error);
         console.error("[Nebi Chat] Error:", error);
         new import_obsidian3.Notice(`AI Error: ${errMsg}`);
         if (this.typingIndicator) {
@@ -830,6 +879,7 @@ var ChatView = class extends import_obsidian3.ItemView {
   async clearChat() {
     var _a;
     const confirmed = await new ConfirmModal(
+      this.app,
       "Clear Chat",
       "Clear all messages? This cannot be undone."
     ).openAndWait();
@@ -855,7 +905,7 @@ var ChatView = class extends import_obsidian3.ItemView {
     this.chatContainerEl.empty();
     const emptyState = this.chatContainerEl.createDiv({ cls: "nebi-chat-empty" });
     const logo = emptyState.createDiv({ cls: "nebi-chat-empty-logo" });
-    logo.innerHTML = NEBI_ICON_SVG;
+    createSvgIcon2(logo, NEBI_ICON_SVG);
     emptyState.createDiv({ cls: "nebi-chat-empty-title" }).setText("Nebi Chat");
     emptyState.createDiv({ cls: "nebi-chat-empty-desc" }).setText(
       "Your AI assistant inside Obsidian. Ask anything about your notes, ideas, or the world."
@@ -873,7 +923,7 @@ var ChatView = class extends import_obsidian3.ItemView {
         text: prompt
       });
       promptBtn.addEventListener("click", () => {
-        this.handleSendMessage(prompt);
+        void this.handleSendMessage(prompt);
       });
     }
   }
@@ -893,9 +943,9 @@ var ChatView = class extends import_obsidian3.ItemView {
   }
   debouncedSave() {
     if (this.lastSaveTimer) {
-      clearTimeout(this.lastSaveTimer);
+      window.clearTimeout(this.lastSaveTimer);
     }
-    this.lastSaveTimer = setTimeout(() => this.saveHistory(), 1e3);
+    this.lastSaveTimer = window.setTimeout(() => this.saveHistory(), 1e3);
   }
   saveHistory() {
     const convId = this.settings.data_.currentConversationId;
@@ -919,7 +969,7 @@ var ChatView = class extends import_obsidian3.ItemView {
   }
   scrollToBottom() {
     if (this.chatContainerEl) {
-      requestAnimationFrame(() => {
+      window.requestAnimationFrame(() => {
         this.chatContainerEl.scrollTop = this.chatContainerEl.scrollHeight;
       });
     }
@@ -963,7 +1013,7 @@ var ChatView = class extends import_obsidian3.ItemView {
     this.settings.data_.conversations.unshift(conv);
     this.settings.data_.currentConversationId = convId;
     this.messages = [];
-    this.settings.save();
+    void this.settings.save();
     this.populateConversationSelect();
     this.renderEmptyState();
     (_a = this.inputArea) == null ? void 0 : _a.focus();
@@ -976,7 +1026,7 @@ var ChatView = class extends import_obsidian3.ItemView {
     } else {
       this.messages = [];
     }
-    this.settings.save();
+    void this.settings.save();
     this.renderMessages();
   }
   populateConversationSelect() {
@@ -1024,7 +1074,7 @@ var ChatView = class extends import_obsidian3.ItemView {
     }
     const blob = new Blob([md], { type: "text/markdown" });
     const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
+    const a = this.containerEl.createEl("a");
     a.href = url;
     a.download = `${title.replace(/[^a-z0-9]/gi, "_").substring(0, 50)}.md`;
     a.click();
@@ -1038,6 +1088,7 @@ var ChatView = class extends import_obsidian3.ItemView {
     const conv = this.settings.data_.conversations.find((c) => c.id === convId);
     const title = (conv == null ? void 0 : conv.title) || "this conversation";
     const confirmed = await new ConfirmModal(
+      this.app,
       "Delete Conversation",
       `Delete "${title}"? This cannot be undone.`
     ).openAndWait();
@@ -1051,7 +1102,7 @@ var ChatView = class extends import_obsidian3.ItemView {
       this.createNewChat();
       return;
     }
-    this.settings.save();
+    void this.settings.save();
     this.populateConversationSelect();
     this.renderMessages();
   }
@@ -1171,15 +1222,15 @@ var PluginSettings = class {
 // src/settings/AIChatSettingTab.ts
 var import_obsidian4 = require("obsidian");
 var AIChatSettingTab = class extends import_obsidian4.PluginSettingTab {
-  constructor(app2, plugin) {
-    super(app2, plugin);
+  constructor(app, plugin) {
+    super(app, plugin);
     this.plugin = plugin;
   }
   display() {
     const { containerEl } = this;
     containerEl.empty();
-    containerEl.createEl("h2", { text: "Nebi Chat Settings" });
-    containerEl.createEl("h3", { text: "Providers" });
+    new import_obsidian4.Setting(containerEl).setName("Nebi Chat Settings").setHeading();
+    new import_obsidian4.Setting(containerEl).setName("Providers").setHeading();
     const providers = [
       {
         id: "gemini",
@@ -1235,27 +1286,32 @@ var AIChatSettingTab = class extends import_obsidian4.PluginSettingTab {
           btn.setDisabled(true);
           try {
             const baseUrl = (config == null ? void 0 : config.baseUrl) || "";
-            const res = await fetch(`${baseUrl}/chat/completions`, {
+            const headers = {
+              "Content-Type": "application/json"
+            };
+            if (apiKey) {
+              headers["Authorization"] = `Bearer ${apiKey}`;
+            }
+            const res = await (0, import_obsidian4.requestUrl)({
+              url: `${baseUrl}/chat/completions`,
               method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-                ...apiKey ? { "Authorization": `Bearer ${apiKey}` } : {}
-              },
+              headers,
               body: JSON.stringify({
                 model,
                 messages: [{ role: "user", content: "hi" }],
                 max_tokens: 5
               })
             });
-            if (res.ok) {
+            if (res.status >= 200 && res.status < 300) {
               new import_obsidian4.Notice(`\u2713 ${provider.name} connected successfully`);
             } else {
-              const err = await res.text().catch(() => "Unknown error");
+              const err = res.text || "Unknown error";
               new import_obsidian4.Notice(`\u2717 ${provider.name}: HTTP ${res.status}`);
               console.error(`[Nebi Chat] Test failed for ${provider.name}:`, err);
             }
           } catch (e) {
-            new import_obsidian4.Notice(`\u2717 ${provider.name}: ${e.message || "Connection failed"}`);
+            const msg = e instanceof Error ? e.message : "Connection failed";
+            new import_obsidian4.Notice(`\u2717 ${provider.name}: ${msg}`);
           } finally {
             btn.setButtonText("Test");
             btn.setDisabled(false);
@@ -1263,7 +1319,7 @@ var AIChatSettingTab = class extends import_obsidian4.PluginSettingTab {
         });
       });
     }
-    containerEl.createEl("h3", { text: "General" });
+    new import_obsidian4.Setting(containerEl).setName("General").setHeading();
     new import_obsidian4.Setting(containerEl).setName("Default Provider").setDesc("Which AI provider to use by default").addDropdown((dropdown) => {
       for (const p of providers) {
         dropdown.addOption(p.id, p.name);
@@ -1281,13 +1337,13 @@ var AIChatSettingTab = class extends import_obsidian4.PluginSettingTab {
       })
     );
     new import_obsidian4.Setting(containerEl).setName("Max Tokens").setDesc("Maximum tokens per response").addSlider(
-      (slider) => slider.setLimits(256, 32768, 256).setValue(this.plugin.settings.maxTokens).setDynamicTooltip().onChange(async (value) => {
+      (slider) => slider.setLimits(256, 32768, 256).setValue(this.plugin.settings.maxTokens).onChange(async (value) => {
         this.plugin.settings.maxTokens = value;
         await this.plugin.settings.save();
       })
     );
     new import_obsidian4.Setting(containerEl).setName("Temperature").setDesc("Randomness of responses (0 = deterministic, 2 = creative)").addSlider(
-      (slider) => slider.setLimits(0, 2, 0.1).setValue(this.plugin.settings.temperature).setDynamicTooltip().onChange(async (value) => {
+      (slider) => slider.setLimits(0, 2, 0.1).setValue(this.plugin.settings.temperature).onChange(async (value) => {
         this.plugin.settings.temperature = value;
         await this.plugin.settings.save();
       })
@@ -1295,6 +1351,7 @@ var AIChatSettingTab = class extends import_obsidian4.PluginSettingTab {
     new import_obsidian4.Setting(containerEl).setName("Reset to Defaults").setDesc("Restore all settings to their defaults (API keys are preserved)").addButton(
       (btn) => btn.setButtonText("Reset").onClick(async () => {
         const confirmed = await new ConfirmModal(
+          this.app,
           "Reset Settings",
           "Reset all settings to defaults? API keys will be preserved."
         ).openAndWait();
@@ -1316,6 +1373,9 @@ var AIChatSettingTab = class extends import_obsidian4.PluginSettingTab {
     );
   }
 };
+
+// src/services/providers/BaseProvider.ts
+var import_obsidian5 = require("obsidian");
 
 // src/services/StreamingParser.ts
 function parseSSEStream(reader, decoder) {
@@ -1425,11 +1485,12 @@ var BaseProvider = class {
       }
       res = await fetch(url, fetchOptions);
     } catch (err) {
-      if (err.name === "AbortError") {
+      const e = err;
+      if (e.name === "AbortError") {
         throw err;
       }
       console.error(`[Nebi Chat] ${this.name} fetch error:`, err);
-      throw new Error(`[${this.name}] Network error: ${err.message || err}`);
+      throw new Error(`[${this.name}] Network error: ${e.message || String(err)}`);
     }
     if (!res.ok) {
       const errText = await res.text().catch(() => "");
@@ -1450,7 +1511,8 @@ var BaseProvider = class {
         }
       }
     } catch (err) {
-      if (err.name === "AbortError") {
+      const e = err;
+      if (e.name === "AbortError") {
         throw err;
       }
       throw err;
@@ -1466,10 +1528,10 @@ var BaseProvider = class {
       headers["Authorization"] = `Bearer ${this.apiKey}`;
     }
     try {
-      const res = await fetch(url, { headers });
-      if (!res.ok)
+      const res = await (0, import_obsidian5.requestUrl)({ url, method: "GET", headers });
+      if (res.status < 200 || res.status >= 300)
         return this.models;
-      const data = await res.json();
+      const data = res.json;
       const models = [];
       if (data.data && Array.isArray(data.data)) {
         for (const m of data.data) {
@@ -1792,7 +1854,7 @@ var ProviderManager = class {
 };
 
 // src/main.ts
-var AIChatPlugin = class extends import_obsidian5.Plugin {
+var AIChatPlugin = class extends import_obsidian6.Plugin {
   async onload() {
     this.settings = new PluginSettings(this);
     await this.settings.load();
@@ -1801,34 +1863,37 @@ var AIChatPlugin = class extends import_obsidian5.Plugin {
       VIEW_TYPE_NEBI_CHAT,
       (leaf) => new ChatView(leaf, this.providerManager, this.settings)
     );
-    this.addRibbonIcon("message-square", "Nebi Chat", () => this.activateView());
+    this.addRibbonIcon("message-square", "Nebi Chat", () => {
+      void this.activateView();
+    });
     this.addCommand({
       id: "open",
-      name: "Open Nebi Chat",
-      callback: () => this.activateView()
+      name: "Open chat",
+      callback: () => {
+        void this.activateView();
+      }
     });
     this.addCommand({
       id: "clear",
-      name: "Clear Nebi Chat History",
+      name: "Clear history",
       callback: () => {
         const leaves = this.app.workspace.getLeavesOfType(VIEW_TYPE_NEBI_CHAT);
         if (leaves.length > 0 && leaves[0].view instanceof ChatView) {
-          leaves[0].view.clearChat();
+          void leaves[0].view.clearChat();
         }
       }
     });
     this.addCommand({
       id: "reload",
-      name: "Reload Nebi Chat (apply settings)",
-      callback: async () => {
+      name: "Reload settings",
+      callback: () => {
         this.providerManager.applySettings();
-        new import_obsidian5.Notice("Nebi Chat settings reloaded");
+        new import_obsidian6.Notice("Nebi Chat settings reloaded");
       }
     });
     this.addSettingTab(new AIChatSettingTab(this.app, this));
   }
   async onunload() {
-    this.app.workspace.detachLeavesOfType(VIEW_TYPE_NEBI_CHAT);
   }
   async activateView() {
     const existing = this.app.workspace.getLeavesOfType(VIEW_TYPE_NEBI_CHAT);

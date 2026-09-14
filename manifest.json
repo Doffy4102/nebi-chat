@@ -1,7 +1,7 @@
 {
   "id": "nebi-chat",
   "name": "Nebi Chat",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "minAppVersion": "1.4.0",
   "description": "AI chat assistant supporting free providers (Gemini, Groq, Cerebras, OpenRouter, Ollama).",
   "author": "doffy",

@@ -9,57 +9,53 @@ export default class AIChatPlugin extends Plugin {
   providerManager!: ProviderManager;
 
   async onload(): Promise<void> {
-    // Load settings
     this.settings = new PluginSettings(this);
     await this.settings.load();
 
-    // Initialize provider manager
     this.providerManager = new ProviderManager(this.settings);
 
-    // Register chat view
     this.registerView(
       VIEW_TYPE_NEBI_CHAT,
       (leaf) => new ChatView(leaf, this.providerManager, this.settings)
     );
 
-    // Add ribbon icon to open chat
-    this.addRibbonIcon("message-square", "Nebi Chat", () => this.activateView());
-
-    // Add command to open chat
-    this.addCommand({
-      id: "open",
-      name: "Open Nebi Chat",
-      callback: () => this.activateView(),
+    this.addRibbonIcon("message-square", "Nebi Chat", () => {
+      void this.activateView();
     });
 
-    // Add command to clear chat
+    this.addCommand({
+      id: "open",
+      name: "Open chat",
+      callback: () => {
+        void this.activateView();
+      },
+    });
+
     this.addCommand({
       id: "clear",
-      name: "Clear Nebi Chat History",
+      name: "Clear history",
       callback: () => {
         const leaves = this.app.workspace.getLeavesOfType(VIEW_TYPE_NEBI_CHAT);
         if (leaves.length > 0 && leaves[0].view instanceof ChatView) {
-          (leaves[0].view as ChatView).clearChat();
+          void (leaves[0].view as ChatView).clearChat();
         }
       },
     });
 
-    // Add command to reload plugin (applies settings changes)
     this.addCommand({
       id: "reload",
-      name: "Reload Nebi Chat (apply settings)",
-      callback: async () => {
+      name: "Reload settings",
+      callback: () => {
         this.providerManager.applySettings();
         new Notice("Nebi Chat settings reloaded");
       },
     });
 
-    // Register settings tab
     this.addSettingTab(new AIChatSettingTab(this.app, this));
   }
 
   async onunload(): Promise<void> {
-    this.app.workspace.detachLeavesOfType(VIEW_TYPE_NEBI_CHAT);
+    // Intentionally empty — do not detach leaves
   }
 
   async activateView(): Promise<void> {

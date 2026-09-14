@@ -1,4 +1,4 @@
-import { MarkdownRenderer } from "obsidian";
+import { Component, MarkdownRenderer } from "obsidian";
 import { Message } from "../types";
 import { NEBI_ICON_SVG } from "../icon-svg";
 
@@ -54,9 +54,11 @@ function formatRelativeTime(timestamp: number): string {
 
 export class ChatMessage {
   private containerEl: HTMLElement;
+  private component: Component;
 
-  constructor(parentEl: HTMLElement) {
+  constructor(parentEl: HTMLElement, component: Component) {
     this.containerEl = parentEl.createDiv({ cls: "nebi-chat-msg" });
+    this.component = component;
   }
 
   render(messageOrContent: Message | string, role?: string): void {
@@ -110,7 +112,7 @@ export class ChatMessage {
     const contentEl = wrapper.createDiv({ cls: "nebi-chat-bubble-content" });
 
     if (message.role === "assistant") {
-      void MarkdownRenderer.render(message.content, contentEl, "", this as never);
+      void MarkdownRenderer.render(this.component, message.content, contentEl, "");
       addCodeBlockCopyButtons(contentEl);
     } else {
       contentEl.setText(message.content);
@@ -133,7 +135,7 @@ export class ChatMessage {
     meta.createSpan({ cls: "nebi-chat-timestamp", text: "typing..." });
 
     const contentEl = wrapper.createDiv({ cls: "nebi-chat-bubble-content" });
-    void MarkdownRenderer.render(text, contentEl, "", this as never);
+    void MarkdownRenderer.render(this.component, text, contentEl, "");
     addCodeBlockCopyButtons(contentEl);
   }
 

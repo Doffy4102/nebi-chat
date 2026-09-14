@@ -195,7 +195,7 @@ export class ChatView extends ItemView {
     this.debouncedSave();
     this.renderMessages();
 
-    this.typingIndicator = new ChatMessage(this.chatContainerEl!);
+    this.typingIndicator = new ChatMessage(this.chatContainerEl!, this);
     this.typingIndicator.renderTypingIndicator();
     this.scrollToBottom();
 
@@ -226,7 +226,7 @@ export class ChatView extends ItemView {
         fullResponse += chunk;
 
         if (!streamingMsg) {
-          streamingMsg = new ChatMessage(this.chatContainerEl!);
+          streamingMsg = new ChatMessage(this.chatContainerEl!, this);
           streamingMsg.renderStreaming(fullResponse);
           this.scrollToBottom();
         } else {
@@ -274,7 +274,7 @@ export class ChatView extends ItemView {
           this.typingIndicator = null;
         }
 
-        const errorComp = new ChatMessage(this.chatContainerEl!);
+        const errorComp = new ChatMessage(this.chatContainerEl!, this);
         errorComp.renderError(errMsg);
         this.scrollToBottom();
       }
@@ -357,7 +357,7 @@ export class ChatView extends ItemView {
     }
 
     for (const message of this.messages) {
-      const msgComponent = new ChatMessage(this.chatContainerEl);
+      const msgComponent = new ChatMessage(this.chatContainerEl, this);
       msgComponent.render(message);
     }
 

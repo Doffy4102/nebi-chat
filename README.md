@@ -11,8 +11,15 @@
 
 > Chat with AI models directly from your Obsidian sidebar — completely free.
 
-<!-- Replace with your screenshot -->
-<!-- ![Nebi Chat Screenshot](./screenshots/screenshot.png) -->
+![Nebi Chat Screenshot](./screenshots/Chat.png)
+
+### Provider Selection
+
+![Provider Dropdown](./screenshots/Providers.png)
+
+### Model Selection
+
+![Model Dropdown](./screenshots/Models.png)
 
 ---
 
@@ -36,6 +43,8 @@
 
 ### 🏪 Community Plugin (Recommended)
 
+![Install from Community](./screenshots/Community%20Plugin.png)
+
 1. Open **Settings** → **Community Plugins**
 2. Search for **"Nebi Chat"**
 3. Click **Install**, then **Enable**
@@ -50,6 +59,8 @@
 ---
 
 ## ⚙️ Configuration
+
+![Settings](./screenshots/settings.png)
 
 1. Open **Settings** → **Nebi Chat**
 2. Enter an API key for at least one provider (see free options below)

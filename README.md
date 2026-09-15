@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="icon.png" alt="Nebi Chat" width="128" />
+</p>
+
 # 🤖 Nebi Chat
 
 [![Version](https://img.shields.io/github/v/release/Doffy4102/nebi-chat?style=flat-square)](https://github.com/Doffy4102/nebi-chat/releases)

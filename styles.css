@@ -239,16 +239,13 @@
   align-items: center;
   justify-content: center;
   margin-left: auto;
-  opacity: 0;
   cursor: pointer;
   color: var(--text-muted);
   border-radius: var(--radius-s);
   padding: 2px 4px;
-  transition: opacity 150ms ease, color 150ms ease;
-}
-
-.nebi-chat-msg:hover .nebi-chat-copy-btn {
-  opacity: 1;
+  background: none;
+  border: none;
+  transition: color 150ms ease;
 }
 
 .nebi-chat-copy-btn:hover {
@@ -258,6 +255,27 @@
 
 .nebi-chat-msg .nebi-chat-copy-btn.nebi-chat-copy-btn-copied {
   color: var(--text-success);
+}
+
+/* Insert / append buttons */
+.nebi-chat-insert-btn,
+.nebi-chat-append-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: var(--text-muted);
+  border-radius: var(--radius-s);
+  padding: 2px 4px;
+  background: none;
+  border: none;
+  transition: color 150ms ease;
+}
+
+.nebi-chat-insert-btn:hover,
+.nebi-chat-append-btn:hover {
+  color: var(--text-normal);
+  background-color: var(--background-modifier-hover);
 }
 
 /* Bubble content */

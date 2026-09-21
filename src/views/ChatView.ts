@@ -1,8 +1,8 @@
-import { ItemView, WorkspaceLeaf, Notice, MarkdownRenderer } from "obsidian";
+import { ItemView, WorkspaceLeaf, Notice, MarkdownRenderer, MarkdownView } from "obsidian";
 import { Message, Conversation } from "../types";
 import { ProviderManager } from "../services/ProviderManager";
 import { PluginSettings } from "../settings/PluginSettings";
-import { ChatMessage } from "../ui/ChatMessage";
+import { ChatMessage, InsertMode } from "../ui/ChatMessage";
 import { ChatInput } from "../ui/ChatInput";
 import { ProviderSelector } from "../ui/ProviderSelector";
 import { ConfirmModal } from "../ui/ConfirmModal";
@@ -45,6 +45,7 @@ export class ChatView extends ItemView {
   private conversationSelect: HTMLSelectElement | null = null;
   private streamingDebounceTimer: ReturnType<typeof window.setTimeout> | null = null;
   private lastSaveTimer: ReturnType<typeof window.setTimeout> | null = null;
+  private lastActiveNoteLeaf: WorkspaceLeaf | null = null;
 
   constructor(
     leaf: WorkspaceLeaf,
@@ -159,6 +160,14 @@ export class ChatView extends ItemView {
       this.renderMessages();
     }
     this.inputArea.focus();
+
+    this.registerEvent(
+      this.app.workspace.on("active-leaf-change", (leaf) => {
+        if (leaf && leaf.view instanceof MarkdownView) {
+          this.lastActiveNoteLeaf = leaf;
+        }
+      })
+    );
   }
 
   async onClose(): Promise<void> {
@@ -202,7 +211,7 @@ export class ChatView extends ItemView {
     this.debouncedSave();
     this.renderMessages();
 
-    this.typingIndicator = new ChatMessage(this.chatContainerEl!, this);
+    this.typingIndicator = new ChatMessage(this.chatContainerEl!, this.app, this);
     this.typingIndicator.renderTypingIndicator();
     this.scrollToBottom();
 
@@ -233,7 +242,9 @@ export class ChatView extends ItemView {
         fullResponse += chunk;
 
         if (!streamingMsg) {
-          streamingMsg = new ChatMessage(this.chatContainerEl!, this);
+          streamingMsg = new ChatMessage(this.chatContainerEl!, this.app, this, (content, mode) => {
+            void this.insertIntoNote(content, mode);
+          });
           streamingMsg.renderStreaming(fullResponse);
           this.scrollToBottom();
         } else {
@@ -281,7 +292,7 @@ export class ChatView extends ItemView {
           this.typingIndicator = null;
         }
 
-        const errorComp = new ChatMessage(this.chatContainerEl!, this);
+        const errorComp = new ChatMessage(this.chatContainerEl!, this.app, this);
         errorComp.renderError(errMsg);
         this.scrollToBottom();
       }
@@ -296,6 +307,43 @@ export class ChatView extends ItemView {
     if (this.abortController) {
       this.abortController.abort();
     }
+  }
+
+  private async insertIntoNote(content: string, mode: InsertMode): Promise<void> {
+    // Use the tracked leaf from active-leaf-change events.
+    // Clicking a sidebar button steals focus, so getActiveViewOfType returns null.
+    const leaf = this.lastActiveNoteLeaf;
+    const file = leaf?.view instanceof MarkdownView
+      ? leaf.view.file
+      : this.app.workspace.getActiveFile();
+
+    if (!file || file.extension !== "md") {
+      new Notice("Open a note first to insert the response");
+      return;
+    }
+
+    if (mode === "append") {
+      try {
+        await this.app.vault.append(file, "\n\n" + content);
+        new Notice("Response appended to note");
+      } catch (error: unknown) {
+        console.error("[Nebi Chat] Append failed:", error);
+        new Notice("Could not append to note");
+      }
+      return;
+    }
+
+    // Insert at cursor — need an open MarkdownView in source mode.
+    if (!(leaf?.view instanceof MarkdownView)) {
+      new Notice("Open a note to insert at cursor");
+      return;
+    }
+    if (leaf.view.getMode() !== "source") {
+      new Notice("Switch the note to Edit mode to insert at cursor");
+      return;
+    }
+    leaf.view.editor.replaceSelection(content);
+    new Notice("Response inserted into note");
   }
 
   async clearChat(): Promise<void> {
@@ -364,7 +412,9 @@ export class ChatView extends ItemView {
     }
 
     for (const message of this.messages) {
-      const msgComponent = new ChatMessage(this.chatContainerEl, this);
+      const msgComponent = new ChatMessage(this.chatContainerEl, this.app, this, (content, mode) => {
+        void this.insertIntoNote(content, mode);
+      });
       msgComponent.render(message);
     }
 

@@ -10,7 +10,7 @@ export class PluginSettings {
   }
 
   async load(): Promise<void> {
-    this.data = Object.assign({}, DEFAULT_SETTINGS, await this.plugin.loadData());
+    this.data = Object.assign({}, DEFAULT_SETTINGS, await this.plugin.loadData() as Partial<PluginSettingsData>);
   }
 
   async save(): Promise<void> {

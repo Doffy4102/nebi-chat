@@ -1,4 +1,4 @@
-import { ItemView, WorkspaceLeaf, Notice, MarkdownRenderer, MarkdownView } from "obsidian";
+import { ItemView, WorkspaceLeaf, Notice, MarkdownView, setIcon } from "obsidian";
 import { Message, Conversation } from "../types";
 import { ProviderManager } from "../services/ProviderManager";
 import { PluginSettings } from "../settings/PluginSettings";
@@ -7,6 +7,7 @@ import { ChatInput } from "../ui/ChatInput";
 import { ProviderSelector } from "../ui/ProviderSelector";
 import { ConfirmModal } from "../ui/ConfirmModal";
 import { NEBI_ICON_SVG } from "../icon-svg";
+import { createSvgIcon } from "../utils/dom";
 
 export const VIEW_TYPE_NEBI_CHAT = "nebi-chat-view";
 
@@ -14,19 +15,6 @@ const MAX_HISTORY = 200;
 
 function generateId(): string {
   return Date.now().toString(36) + Math.random().toString(36).substring(2, 8);
-}
-
-function setSvgContent(parent: HTMLElement, svgContent: string): void {
-  parent.empty();
-  const doc = new DOMParser().parseFromString(svgContent, "image/svg+xml");
-  const svg = doc.querySelector("svg");
-  if (svg) parent.appendChild(document.importNode(svg, true));
-}
-
-function createSvgIcon(parent: HTMLElement, svgContent: string): HTMLElement {
-  const wrapper = parent.createDiv({ cls: "nebi-chat-icon-wrapper" });
-  setSvgContent(wrapper, svgContent);
-  return wrapper;
 }
 
 export class ChatView extends ItemView {
@@ -43,8 +31,8 @@ export class ChatView extends ItemView {
   private exportBtnEl: HTMLButtonElement | null = null;
   private newChatBtnEl: HTMLButtonElement | null = null;
   private conversationSelect: HTMLSelectElement | null = null;
-  private streamingDebounceTimer: ReturnType<typeof window.setTimeout> | null = null;
-  private lastSaveTimer: ReturnType<typeof window.setTimeout> | null = null;
+  private streamingDebounceTimer: number | null = null;
+  private lastSaveTimer: number | null = null;
   private lastActiveNoteLeaf: WorkspaceLeaf | null = null;
 
   constructor(
@@ -87,21 +75,21 @@ export class ChatView extends ItemView {
       cls: "nebi-chat-icon-btn",
       attr: { "aria-label": "New chat", title: "New chat" },
     });
-    this.newChatBtnEl.innerHTML = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>`;
+    setIcon(this.newChatBtnEl, "plus");
     this.newChatBtnEl.addEventListener("click", () => this.createNewChat());
 
     this.exportBtnEl = headerBtns.createEl("button", {
       cls: "nebi-chat-icon-btn",
       attr: { "aria-label": "Export chat", title: "Export to markdown" },
     });
-    this.exportBtnEl.innerHTML = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>`;
+    setIcon(this.exportBtnEl, "download");
     this.exportBtnEl.addEventListener("click", () => this.exportChat());
 
     this.refreshBtnEl = headerBtns.createEl("button", {
       cls: "nebi-chat-icon-btn",
       attr: { "aria-label": "Refresh settings", title: "Refresh settings" },
     });
-    this.refreshBtnEl.innerHTML = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>`;
+    setIcon(this.refreshBtnEl, "refresh-cw");
     this.refreshBtnEl.addEventListener("click", () => {
       void this.reloadPlugin();
     });
@@ -110,7 +98,7 @@ export class ChatView extends ItemView {
       cls: "nebi-chat-icon-btn",
       attr: { "aria-label": "Clear chat", title: "Clear chat" },
     });
-    this.clearBtnEl.innerHTML = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>`;
+    setIcon(this.clearBtnEl, "trash-2");
     this.clearBtnEl.addEventListener("click", () => {
       void this.clearChat();
     });
@@ -126,7 +114,7 @@ export class ChatView extends ItemView {
       cls: "nebi-chat-icon-btn nebi-chat-conv-delete-btn",
       attr: { "aria-label": "Delete conversation", title: "Delete conversation" },
     });
-    deleteConvBtn.innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>`;
+    setIcon(deleteConvBtn, "trash-2");
     deleteConvBtn.addEventListener("click", () => {
       void this.deleteCurrentConversation();
     });

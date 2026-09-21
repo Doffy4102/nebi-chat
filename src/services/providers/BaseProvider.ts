@@ -74,40 +74,37 @@ export abstract class BaseProvider implements AIProvider {
     const url = `${this.baseUrl || this.getBaseUrl()}/chat/completions`;
     const body = this.buildRequestBody(request);
 
-    const signal = request.signal;
-
-    let res: Response;
+    let arrayBuffer: ArrayBuffer;
+    let status: number;
     try {
-      const fetchOptions: RequestInit = {
+      const response = await requestUrl({
+        url,
         method: "POST",
         headers: this.getHeaders(),
         body: JSON.stringify(body),
-      };
-      if (signal) {
-        fetchOptions.signal = signal;
-      }
-      // Streaming requires native fetch — requestUrl does not support SSE
-      res = await fetch(url, fetchOptions);
+        contentType: "application/json",
+      });
+      arrayBuffer = response.arrayBuffer;
+      status = response.status;
     } catch (err: unknown) {
       const e = err as { name?: string; message?: string };
-      if (e.name === "AbortError") {
-        throw err;
-      }
       console.error(`[Nebi Chat] ${this.name} fetch error:`, err);
       throw new Error(`[${this.name}] Network error: ${e.message || String(err)}`);
     }
 
-    if (!res.ok) {
-      const errText = await res.text().catch(() => "");
+    if (status < 200 || status >= 300) {
+      const errText = new TextDecoder().decode(arrayBuffer).substring(0, 500);
       console.error(`[Nebi Chat] ${this.name} error body:`, errText);
-      throw new Error(`[${this.name}] HTTP ${res.status}: ${errText.substring(0, 500)}`);
+      throw new Error(`[${this.name}] HTTP ${status}: ${errText}`);
     }
 
-    if (!res.body) {
-      throw new Error(`[${this.name}] No response body`);
-    }
-
-    const reader = res.body.getReader();
+    const stream = new ReadableStream({
+      start(controller) {
+        controller.enqueue(new Uint8Array(arrayBuffer));
+        controller.close();
+      },
+    });
+    const reader = stream.getReader();
     const decoder = new TextDecoder();
 
     try {
@@ -140,7 +137,7 @@ export abstract class BaseProvider implements AIProvider {
       const res = await requestUrl({ url, method: "GET", headers });
       if (res.status < 200 || res.status >= 300) return this.models;
 
-      const data: { data?: Array<{ id: string; context_window?: number }> } = res.json;
+      const data = res.json as { data?: Array<{ id: string; context_window?: number }> };
       const models: ModelInfo[] = [];
 
       if (data.data && Array.isArray(data.data)) {

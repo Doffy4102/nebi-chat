@@ -1,19 +1,7 @@
-import { App, Component, MarkdownRenderer } from "obsidian";
+import { App, Component, MarkdownRenderer, setIcon } from "obsidian";
 import { Message } from "../types";
 import { NEBI_ICON_SVG } from "../icon-svg";
-
-function createSvgIcon(parent: HTMLElement, svgContent: string): HTMLElement {
-  const wrapper = parent.createDiv({ cls: "nebi-chat-icon-wrapper" });
-  setSvgContent(wrapper, svgContent);
-  return wrapper;
-}
-
-function setSvgContent(parent: HTMLElement, svgContent: string): void {
-  parent.empty();
-  const doc = new DOMParser().parseFromString(svgContent, "image/svg+xml");
-  const svg = doc.querySelector("svg");
-  if (svg) parent.appendChild(document.importNode(svg, true));
-}
+import { setSvgContent, createSvgIcon } from "../utils/dom";
 
 function addCodeBlockCopyButtons(container: HTMLElement): void {
   const pres = container.querySelectorAll("pre");
@@ -26,20 +14,19 @@ function addCodeBlockCopyButtons(container: HTMLElement): void {
     const copyIcon = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>`;
     const checkIcon = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>`;
     setSvgContent(btn, copyIcon);
-    btn.addEventListener("click", async () => {
+    btn.addEventListener("click", () => {
       const code = pre.querySelector("code");
       const text = code ? code.textContent || "" : pre.textContent || "";
-      try {
-        await navigator.clipboard.writeText(text);
+      navigator.clipboard.writeText(text).then(() => {
         btn.addClass("nebi-chat-code-copy-btn-copied");
         setSvgContent(btn, checkIcon);
         window.setTimeout(() => {
           btn.removeClass("nebi-chat-code-copy-btn-copied");
           setSvgContent(btn, copyIcon);
         }, 1500);
-      } catch {
+      }).catch(() => {
         // Clipboard API may be blocked
-      }
+      });
     });
   }
 }
@@ -132,18 +119,17 @@ export class ChatMessage {
     const copySvg = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>`;
     const checkSvg = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>`;
     copyBtn.innerHTML = copySvg;
-    copyBtn.addEventListener("click", async () => {
-      try {
-        await navigator.clipboard.writeText(message.content);
+    copyBtn.addEventListener("click", () => {
+      navigator.clipboard.writeText(message.content).then(() => {
         copyBtn.addClass("nebi-chat-copy-btn-copied");
         copyBtn.innerHTML = checkSvg;
         window.setTimeout(() => {
           copyBtn.removeClass("nebi-chat-copy-btn-copied");
           copyBtn.innerHTML = copySvg;
         }, 1500);
-      } catch {
+      }).catch(() => {
         // Clipboard API may be blocked
-      }
+      });
     });
 
     const contentEl = wrapper.createDiv({ cls: "nebi-chat-bubble-content" });

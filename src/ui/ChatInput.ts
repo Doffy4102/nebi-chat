@@ -1,3 +1,5 @@
+import { setIcon } from "obsidian";
+
 export class ChatInput {
   private containerEl: HTMLElement;
   private inputWrapper: HTMLElement;
@@ -34,13 +36,13 @@ export class ChatInput {
       cls: "nebi-chat-send-btn",
       attr: { "aria-label": "Send message" },
     });
-    this.sendBtnEl.innerHTML = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>`;
+    setIcon(this.sendBtnEl, "send");
 
     this.stopBtnEl = btnGroup.createEl("button", {
       cls: "nebi-chat-stop-btn nebi-chat-hidden",
       attr: { "aria-label": "Stop generation" },
     });
-    this.stopBtnEl.innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><rect x="4" y="4" width="16" height="16" rx="2"></rect></svg>`;
+    setIcon(this.stopBtnEl, "square");
 
     this.hintEl = this.containerEl.createDiv({ cls: "nebi-chat-hint" });
     this.hintEl.setText("Enter to send \u00B7 Shift+Enter for new line");

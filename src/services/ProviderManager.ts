@@ -80,12 +80,10 @@ export class ProviderManager {
       model,
       systemPrompt: settingsProvider?.systemPrompt || request.systemPrompt || this.settings.systemPrompt,
       signal: request.signal,
-    });
+    }) as AsyncGenerator<string>;
 
-    let result = await gen.next();
-    while (!result.done) {
-      yield result.value;
-      result = await gen.next();
+    for await (const value of gen) {
+      yield value;
     }
   }
 }

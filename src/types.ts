@@ -84,7 +84,7 @@ export const DEFAULT_SETTINGS: PluginSettingsData = {
     groq: {
       apiKey: "",
       baseUrl: "https://api.groq.com/openai/v1",
-      selectedModel: "groq/compound-mini",
+      selectedModel: "openai/gpt-oss-120b",
       enabled: true,
       systemPrompt: "",
     },

@@ -1,4 +1,4 @@
-import { Notice, PluginSettingTab, requestUrl, SettingDefinitionItem, SettingGroupItem } from "obsidian";
+import { Notice, PluginSettingTab, SettingDefinitionItem, SettingGroupItem } from "obsidian";
 import { DEFAULT_SETTINGS, ProviderSettings } from "../types";
 import type AIChatPlugin from "../main";
 import { ConfirmModal } from "../ui/ConfirmModal";

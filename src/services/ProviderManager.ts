@@ -63,7 +63,10 @@ export class ProviderManager {
 
     const settingsProvider = this.settings.getProvider(provider.id);
     const apiKey = settingsProvider?.apiKey || "";
-    const model = settingsProvider?.selectedModel || provider.models[0]?.id;
+    const requested = settingsProvider?.selectedModel;
+    const model = provider.models.some((m) => m.id === requested)
+      ? requested
+      : provider.models[0]?.id;
 
     if (provider.id !== "ollama" && !apiKey) {
       throw new Error(

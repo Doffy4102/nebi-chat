@@ -100,7 +100,7 @@ export class ChatMessage {
         cls: "nebi-chat-insert-btn",
         attr: { "aria-label": "Insert at cursor", title: "Insert at cursor" },
       });
-      insertBtn.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>`;
+      setIcon(insertBtn, "pen");
       insertBtn.addEventListener("click", () => {
         this.onInsert?.(message.content, "cursor");
       });
@@ -109,7 +109,7 @@ export class ChatMessage {
         cls: "nebi-chat-append-btn",
         attr: { "aria-label": "Append to end of note", title: "Append to end of note" },
       });
-      appendBtn.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 17V3"></path><path d="m6 11 6 6 6-6"></path><path d="M19 21H5"></path></svg>`;
+      setIcon(appendBtn, "arrow-down-to-line");
       appendBtn.addEventListener("click", () => {
         this.onInsert?.(message.content, "append");
       });
@@ -118,14 +118,14 @@ export class ChatMessage {
     const copyBtn = headerRow.createEl("button", { cls: "nebi-chat-copy-btn", attr: { "aria-label": "Copy message" } });
     const copySvg = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>`;
     const checkSvg = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>`;
-    copyBtn.innerHTML = copySvg;
+    setSvgContent(copyBtn, copySvg);
     copyBtn.addEventListener("click", () => {
       navigator.clipboard.writeText(message.content).then(() => {
         copyBtn.addClass("nebi-chat-copy-btn-copied");
-        copyBtn.innerHTML = checkSvg;
+        setSvgContent(copyBtn, checkSvg);
         window.setTimeout(() => {
           copyBtn.removeClass("nebi-chat-copy-btn-copied");
-          copyBtn.innerHTML = copySvg;
+          setSvgContent(copyBtn, copySvg);
         }, 1500);
       }).catch(() => {
         // Clipboard API may be blocked

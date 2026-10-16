@@ -34,20 +34,20 @@ export class AIChatSettingTab extends PluginSettingTab {
   setControlValue(key: string, value: unknown): void {
     if (key === "activeProvider") {
       this.plugin.settings.activeProvider = value as string;
-      this.plugin.settings.save();
+      void this.plugin.settings.save();
     } else if (key === "systemPrompt") {
       this.plugin.settings.systemPrompt = value as string;
-      this.plugin.settings.save();
+      void this.plugin.settings.save();
     } else if (key === "maxTokens") {
       this.plugin.settings.maxTokens = value as number;
-      this.plugin.settings.save();
+      void this.plugin.settings.save();
     } else if (key === "temperature") {
       this.plugin.settings.temperature = value as number;
-      this.plugin.settings.save();
+      void this.plugin.settings.save();
     } else if (key.startsWith("provider_")) {
       const id = key.split("_")[1];
       this.plugin.settings.setProvider(id, { apiKey: value as string });
-      this.plugin.settings.save();
+      void this.plugin.settings.save();
       this.plugin.providerManager.applySettings();
     }
   }

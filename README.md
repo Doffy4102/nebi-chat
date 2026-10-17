@@ -43,8 +43,6 @@
 
 ### 🏪 Community Plugin (Recommended)
 
-![Install from Community](./screenshots/Community%20Plugin.png)
-
 1. Open **Settings** → **Community Plugins**
 2. Search for **"Nebi Chat"**
 3. Click **Install**, then **Enable**

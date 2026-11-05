@@ -1,6 +1,7 @@
 import { ItemView, WorkspaceLeaf, Notice, MarkdownView, setIcon } from "obsidian";
 import { Message, Conversation } from "../types";
 import { ProviderManager } from "../services/ProviderManager";
+import { buildNoteContext, NoteContextData } from "../services/NoteContext";
 import { PluginSettings } from "../settings/PluginSettings";
 import { ChatMessage, InsertMode } from "../ui/ChatMessage";
 import { ChatInput } from "../ui/ChatInput";
@@ -34,6 +35,8 @@ export class ChatView extends ItemView {
   private streamingDebounceTimer: number | null = null;
   private lastSaveTimer: number | null = null;
   private lastActiveNoteLeaf: WorkspaceLeaf | null = null;
+  private contextDetachedForNextSend: boolean = false;
+  private contextChipTicket: number = 0;
 
   constructor(
     leaf: WorkspaceLeaf,
@@ -139,7 +142,8 @@ export class ChatView extends ItemView {
       (text) => {
         void this.handleSendMessage(text);
       },
-      () => this.handleStopGeneration()
+      () => this.handleStopGeneration(),
+      () => this.handleToggleContext()
     );
 
     if (this.messages.length === 0) {
@@ -148,12 +152,14 @@ export class ChatView extends ItemView {
       this.renderMessages();
     }
     this.inputArea.focus();
+    void this.refreshContextChip();
 
     this.registerEvent(
       this.app.workspace.on("active-leaf-change", (leaf) => {
         if (leaf && leaf.view instanceof MarkdownView) {
           this.lastActiveNoteLeaf = leaf;
         }
+        void this.refreshContextChip();
       })
     );
   }
@@ -190,10 +196,18 @@ export class ChatView extends ItemView {
   }
 
   private async handleSendMessage(text: string): Promise<void> {
+    let noteCtx: NoteContextData | null = null;
+    if (!this.contextDetachedForNextSend) {
+      noteCtx = await buildNoteContext(this.app, this.lastActiveNoteLeaf);
+    }
+    this.contextDetachedForNextSend = false;
+    void this.refreshContextChip();
+
     const userMessage: Message = {
       role: "user",
       content: text,
       timestamp: Date.now(),
+      ...(noteCtx ? { contextFile: noteCtx.path } : {}),
     };
     this.messages.push(userMessage);
     this.debouncedSave();
@@ -219,7 +233,7 @@ export class ChatView extends ItemView {
     try {
       for await (const chunk of this.providerManager.chat({
         messages: this.messages,
-        systemPrompt: this.settings.systemPrompt,
+        systemPrompt: this.buildChatSystemPrompt(noteCtx),
         signal: this.abortController.signal,
       })) {
         if (this.typingIndicator) {
@@ -289,6 +303,27 @@ export class ChatView extends ItemView {
       this.abortController = null;
       this.typingIndicator = null;
     }
+  }
+
+  private handleToggleContext(): void {
+    this.contextDetachedForNextSend = !this.contextDetachedForNextSend;
+    void this.refreshContextChip();
+  }
+
+  private async refreshContextChip(): Promise<void> {
+    const ticket = ++this.contextChipTicket;
+    const noteCtx = await buildNoteContext(this.app, this.lastActiveNoteLeaf);
+    if (ticket !== this.contextChipTicket) return;
+    this.inputArea?.setNoteContext(noteCtx, !this.contextDetachedForNextSend);
+  }
+
+  private buildChatSystemPrompt(noteCtx: NoteContextData | null): string {
+    const base = this.settings.systemPrompt || "";
+    if (!noteCtx) return base;
+
+    const truncatedSuffix = noteCtx.truncated ? "\n[truncated]" : "";
+    const block = `<note_context path="${noteCtx.path}">\n${noteCtx.content}${truncatedSuffix}\n</note_context>`;
+    return base ? `${base}\n\n${block}` : block;
   }
 
   private handleStopGeneration(): void {
@@ -534,7 +569,11 @@ export class ChatView extends ItemView {
       const roleName = msg.role === "user" ? "You" : msg.role === "assistant" ? "Nebi" : "System";
       const time = new Date(msg.timestamp).toLocaleTimeString();
       md += `### ${roleName} *(${time})*\n\n`;
-      md += `${msg.content}\n\n---\n\n`;
+      md += `${msg.content}\n\n`;
+      if (msg.contextFile) {
+        md += `> 📄 attached: ${msg.contextFile}\n\n`;
+      }
+      md += `---\n\n`;
     }
 
     const blob = new Blob([md], { type: "text/markdown" });

@@ -83,6 +83,7 @@ export abstract class BaseProvider implements AIProvider {
         headers: this.getHeaders(),
         body: JSON.stringify(body),
         contentType: "application/json",
+        throw: false,
       });
       arrayBuffer = response.arrayBuffer;
       status = response.status;

@@ -2,6 +2,7 @@ export interface Message {
   role: "user" | "assistant" | "system";
   content: string;
   timestamp: number;
+  contextFile?: string;
 }
 
 export interface ChatHistory {

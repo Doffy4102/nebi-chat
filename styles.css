@@ -637,6 +637,65 @@
 }
 
 /* ============================================
+   Note Context Chips
+   ============================================ */
+.nebi-chat-context-dock {
+  display: flex;
+}
+
+.nebi-chat-context-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  max-width: 100%;
+  min-width: 0;
+  padding: 2px var(--size-4-2);
+  background-color: var(--background-secondary);
+  border: 1px solid var(--background-modifier-border);
+  border-radius: var(--radius-s);
+  color: var(--text-muted);
+  font-family: var(--font-interface);
+  font-size: var(--font-ui-smallest);
+  line-height: 1.4;
+  cursor: pointer;
+  transition: background-color 150ms ease, border-color 150ms ease, color 150ms ease;
+}
+
+.nebi-chat-context-chip:hover {
+  background-color: var(--background-modifier-hover);
+  border-color: var(--interactive-accent);
+  color: var(--text-normal);
+}
+
+.nebi-chat-context-chip-icon {
+  display: flex;
+  flex-shrink: 0;
+}
+
+.nebi-chat-context-chip-icon svg {
+  width: 12px;
+  height: 12px;
+}
+
+.nebi-chat-context-chip-label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0;
+}
+
+.nebi-chat-context-chip-off {
+  opacity: 0.55;
+  border-style: dashed;
+}
+
+.nebi-chat-bubble .nebi-chat-context-chip {
+  margin-bottom: var(--size-4-1);
+  cursor: default;
+  pointer-events: none;
+}
+
+/* ============================================
    Scrollbar
    ============================================ */
 .nebi-chat-messages::-webkit-scrollbar {

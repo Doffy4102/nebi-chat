@@ -132,6 +132,17 @@ export class ChatMessage {
       });
     });
 
+    if (message.contextFile) {
+      const chip = wrapper.createDiv({
+        cls: "nebi-chat-context-chip",
+        attr: { title: message.contextFile },
+      });
+      const chipIcon = chip.createSpan({ cls: "nebi-chat-context-chip-icon" });
+      setIcon(chipIcon, "file-text");
+      const basename = message.contextFile.split("/").pop() || message.contextFile;
+      chip.createSpan({ cls: "nebi-chat-context-chip-label", text: basename });
+    }
+
     const contentEl = wrapper.createDiv({ cls: "nebi-chat-bubble-content" });
 
     if (message.role === "assistant") {
